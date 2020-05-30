@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Hexo</title>
+  
+  
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://linshig0ng.github.io/"/>
+  <updated>2020-05-30T16:18:04.514Z</updated>
+  <id>http://linshig0ng.github.io/</id>
+  
+  <author>
+    <name>有关部门临时工</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>test</title>
+    <link href="http://linshig0ng.github.io/2020/05/30/test/"/>
+    <id>http://linshig0ng.github.io/2020/05/30/test/</id>
+    <published>2020-05-30T15:57:42.000Z</published>
+    <updated>2020-05-30T16:18:04.514Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;&lt;img src=&quot;/2020/05/30/test/ysoserial.png&quot; alt=&quot;ysoserial&quot;&gt;&lt;/p&gt;
+&lt;pre class=&quot; language-java&quot;&gt;&lt;code class=&quot;language-java&quot;&gt;&lt;span
+        
+      
+    
+    </summary>
+    
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Hello World</title>
+    <link href="http://linshig0ng.github.io/2020/05/30/hello-world/"/>
+    <id>http://linshig0ng.github.io/2020/05/30/hello-world/</id>
+    <published>2020-05-30T14:24:17.702Z</published>
+    <updated>2020-05-30T14:24:17.702Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;Welcome to &lt;a href=&quot;https://hexo.io/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Hexo&lt;/a&gt;! This is your very first post. Check &lt;a
+        
+      
+    
+    </summary>
+    
+    
+    
+  </entry>
+  
+</feed>
