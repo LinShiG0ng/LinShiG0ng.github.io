@@ -1,0 +1,1471 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="Java框架代码审计思路">
+    <meta name="description" content="">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>Java框架级SSM代码审计思路 | Hexo</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<meta name="generator" content="Hexo 4.2.1"><link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">有关部门临时工</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>留言板</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">Hexo</div>
+        <div class="logo-desc">
+            
+            Never really desperate, only the lost of the soul.
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			留言板
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/LinShiG0ng" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/LinShiG0ng" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('https://cdn.educba.com/academy/wp-content/uploads/2018/08/Spring-Framework-Interview-Questions.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">Java框架级SSM代码审计思路</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        height: calc(100vh - 250px);
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    .toc-fixed .toc-link::before{
+        position: fixed!important;/*当toc的位置改为fixed时，.toc-link::before也要改为fixed*/
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #toc-content .is-active-link::before {
+        background-color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Java/">
+                                <span class="chip bg-color">Java</span>
+                            </a>
+                        
+                            <a href="/tags/Web%E5%AE%89%E5%85%A8/">
+                                <span class="chip bg-color">Web安全</span>
+                            </a>
+                        
+                            <a href="/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/">
+                                <span class="chip bg-color">代码审计</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2020-05-31
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2020-05-31
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    8.9k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    32 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <p><strong>Java框架级SSM代码审计思路</strong></p>
+<p><a href="#ssm框架简介">1 SSM框架简介 1</a></p>
+<p><a href="#springmvc">1.1 SpringMVC 2</a></p>
+<p><a href="#spring">1.2 Spring 2</a></p>
+<p><a href="#mybatis">1.3 Mybatis 2</a></p>
+<p><a href="#servlet">1.4 Servlet 2</a></p>
+<p><a href="#ssm框架代码执行流程和审计思路">2 SSM框架代码执行流程和审计思路 3</a></p>
+<p><a href="#审计的出发点web.xml">2.1 审计的出发点web.xml 3</a></p>
+<p><a href="#spring核心配置文件applicationcontext.xml">2.2 Spring核心配置文件applicationContext.xml<br>4</a></p>
+<p><a href="#ssm之springmvc执行流程">2.3 SSM之SpringMVC执行流程 6</a></p>
+<p><a href="#ssm之spring执行流程">2.4 SSM之Spring执行流程 9</a></p>
+<p><a href="#ssm之mybatis执行流程">2.5 SSM之Mybatis执行流程 11</a></p>
+<p><a href="#审计的重点filter过滤器">2.6 审计的重点filter过滤器 18</a></p>
+<p><a href="#ssm框架审计思路总结">3 SSM框架审计思路总结 27</a></p>
+<p><a href="#思路总结">3.1 思路总结 27</a></p>
+<p><a href="#补充知识">3.2 补充知识 28</a></p>
+<p><a href="#学习建议">3.3 学习建议 28</a></p>
+<h1 id="SSM框架简介"><a href="#SSM框架简介" class="headerlink" title="SSM框架简介"></a>SSM框架简介</h1><p>SSM框架，即SpringMVC+Spring+Mybatis三个开源框架整合在一起的缩写。</p>
+<p>在SSM框架之前生产环境中SSH框架占据多数，即Struts2+Spring+Hibernate三个开源框架整合而成。后因Struts2爆出众多高危漏洞，导致目前SSM逐渐代替SSH成为主流开发框架的选择。</p>
+<p>审计SSM框架首先就要对MVC设计模式和，web三层架构有一定程度的了解，限于篇幅原因这里就简单介绍一下</p>
+<h2 id="SpringMVC"><a href="#SpringMVC" class="headerlink" title="SpringMVC"></a>SpringMVC</h2><p>是一种基于Java的实现MVC设计模式的请求驱动类型的轻量级Web框架，使用了MVC架构模式的思想，将web层进行职责解耦，基于请求驱动指的就是使用请求-响应模型，框架的目的就是帮助我们简化开发。</p>
+<h2 id="Spring"><a href="#Spring" class="headerlink" title="Spring"></a>Spring</h2><p>是分层的 Java SE/EE full-stack 轻量级开源框架，以 IOC（Inverse of<br>Control，控制反转）和 AOP（Aspect Oriented<br>Programming，面向切面编程）为内核，使用基本的 JavaBean 完成以前只可能由 EJB<br>完成的工作，取代了 EJB<br>臃肿和低效的开发模式，Spring的用途不仅仅限于服务器端的开发。从简单性、可测试性和松耦合性角度而言，绝大部分Java应用都可以从Spring中受益</p>
+<h2 id="Mybatis"><a href="#Mybatis" class="headerlink" title="Mybatis"></a>Mybatis</h2><p>是支持定制化 SQL、存储过程以及高级映射的优秀的持久层框架。MyBatis<br>避免了几乎所有的 JDBC 代码和手动设置参数以及获取结果集。MyBatis<br>可以对配置和原生Map使用简单的 XML 或注解，将接口和 Java 的 POJOs(Plain Old Java<br>Objects,普通的 Java对象)映射成数据库中的记录。</p>
+<h2 id="Servlet"><a href="#Servlet" class="headerlink" title="Servlet"></a>Servlet</h2><p>还有一项技术虽然名称没有出现在这三个开源框架中但是SpringMVC的底层就是以此技术进行构建的，这项技术就是Servlet</p>
+<p>Servlet是基于Java技术的Web组件，由容器管理并产生动态的内容。Servlet与客户端通过Servlet容器实现的请求/响应模型进行交互。</p>
+<p>相对以SSM框架搭建的java web项目进行审计，上述这些都是要有一定程度的了解的。</p>
+<h1 id="SSM框架代码执行流程和审计思路"><a href="#SSM框架代码执行流程和审计思路" class="headerlink" title="SSM框架代码执行流程和审计思路"></a>SSM框架代码执行流程和审计思路</h1><h2 id="审计的出发点web-xml"><a href="#审计的出发点web-xml" class="headerlink" title="审计的出发点web.xml"></a>审计的出发点web.xml</h2><p>其实代码审计的核心思想就是追踪参数，而追踪参数的步骤就是程序执行的步骤，说白了代码审计就是一个跟踪程序执行步骤的一个过程，当我们知道了SSM框架的一个执行流程，自然就知道了如何如跟踪一个参数，剩下的就是去观察在参数传递的过程中有没有一些常见的漏洞点。</p>
+<p>我们这里通过一个简单的Demo来描述一下SSM框架搭建的项目是如何完成一次用户请求，它的流程是怎么样的，而参数又是怎样被传递怎样被过滤的，当我们明白了这些，就可以尝试自己上手一些SSM的项目审计。</p>
+<p>首先我把Demo的全部文件和文件结构粘贴出来</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/1.png" alt=""></p>
+<p>这是一个简单的图书管理Demo目录，功能是对图书名称，数量和简介简单的增删改查</p>
+<p>首先不管我们是审计一个项目还是包括Tomcat加载一个项目一般都是由web.xml这个文件开始的</p>
+<p>当然一个项目中没有web.xml也是可以的，可以通过servlet3.0开始提供的一些新注解来达到和配置web.xml一样的效果，但是这样的项目很少会碰到，所以我们以主流的配置web.xml的项目来作为讲解。</p>
+<p>Tomcat会加载web.xml文件读取文件中的内容</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/2.png" alt=""></p>
+<p>web.xml文件主要的工作包括两部分：1、web.xml启动spring容器；2、DispathcheServlet的声明；3、其余工作是session过期，字符串编码等</p>
+<p>首先是生成DispatcherServlet类,DispatcherServlet是前端控制器设计模式的实现，提供Spring<br>Web MVC的集中访问点（也就是把前端请求分发到目标controller），而且与Spring<br>IoC容器无缝集成，从而可以获得Spring的所有好处。</p>
+<p>简单理解就是将我们的请求转发至我们的SpringMVC中去，交由我们SpringMVC的Controller来进行接下来的处理</p>
+<p>然后下面有一个&lt;init-param&gt;子标签，是生成DispatcherServlet时的初始化参数contextConfigLocation参数，Spring会根据这个参数去加载所有逗号分隔的xml文件，如果没有这个参数，Spring默认加载WEB-INF/DispatcherServlet-servlet.xml文件</p>
+<p>下面的&lt;servlet-mapping&gt;标签中还有一个子标签&lt;url-pattern&gt;里面的value是“/”代表拦截所有请求。</p>
+<p>下面的&lt;filter&gt;标签放在后面讲</p>
+<h2 id="Spring核心配置文件applicationContext-xml"><a href="#Spring核心配置文件applicationContext-xml" class="headerlink" title="Spring核心配置文件applicationContext.xml"></a>Spring核心配置文件applicationContext.xml</h2><p>然后我们根据加载顺序去看applicationContext.xml</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/3.png" alt=""></p>
+<p>applicationContext.xml中包含了三个配置文件，这三个配置文件就是我们用Spring来整合SpringMVC和Mybaits的配置文件，其实这三个配置文件中的内容都可以直接写applicationContext.xml中因为applicationContext.xml是Spring的核心配置文件，例如生成Bean，配置连接池，生成sqlSessionFactory。但是为了便于理解，我们这些配置分别写在三个配置文件中，由applicationContext.xml将这三个xml进行关联，由下面这张截图我们可以清晰的看到applicationContext.xml将这三个配置文件关联了起来。</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/4.png" alt=""></p>
+<p>首先数据经由DispatcherServlet派发至Spring-mvc的controller层所以我们先看Spring-mvc.xml这个配置文件</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/5.png" alt=""></p>
+<p>&lt;mvc:annotation-driven /&gt;标签</p>
+<p>如果在web.xml中servlet-mapping的url-pattern设置的是/，而不是如.do。表示将所有的文件，包含静态资源文件都交给spring<br>mvc处理。就需要用到&lt;mvc:annotation-driven<br>/&gt;了。如果不加，DispatcherServlet则无法区分请求是资源文件还是mvc的注解，而导致controller的请求报404错误</p>
+<p>&lt;mvc:default-servlet-handler/&gt;</p>
+<p>在Spring-mvc.xml中配置&lt;mvc:default-servlet-handler /&gt;后，会在Spring<br>MVC上下文中定义一个org.springframework.web.servlet.resource.DefaultServletHttpRequestHandler，它会像一个检查员，对进入DispatcherServlet的URL进行筛查，如果发现是静态资源的请求，就将该请求转由Web应用服务器默认的Servlet处理，如果不是静态资源的请求，才由DispatcherServlet继续处理，这么做是为了保证Spring-mvc优雅REST风格的资源URL。</p>
+<p>剩下两项一个是指定了返回的view所在的路径，另一个是指定SpringMVC注解的扫描路径</p>
+<p>不难看出这个配置文件中都是和Spring-mvc相关的配置。</p>
+<h2 id="SSM之SpringMVC执行流程"><a href="#SSM之SpringMVC执行流程" class="headerlink" title="SSM之SpringMVC执行流程"></a>SSM之SpringMVC执行流程</h2><p>接下来就是我们SpringMVC<br>controller层接受前台传入的数据,这里我们让demo跑起来以方便演示和讲解</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/6.png" alt=""></p>
+<p>这是我们的index首页，我们看下页面源码</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/7.png" alt=""></p>
+<p>可以看到a标签的超链接是<a href="http://localhost:8080/SSMFrameWorkTest_war/book/allbook" target="_blank" rel="noopener">http://localhost:8080/SSMFrameWorkTest_war/book/allbook</a></p>
+<p>${pageContext.request.contextPath}</p>
+<p>是JSP取得绝对路径的方法,<br>也就是取出部署的应用程序名或者是当前的项目名称,这样当我们把项目部署到生产环境中时不容易出错</p>
+<p>后台此时收到的请求路径为/book/allbook首先SpringMVC在项目启动时会去扫描我们指定的要扫描的路径也就是com.kuang.controller这个路径下的所有类，我们看下BookController这个类的代码</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/8.png" alt=""></p>
+<p>SpringMVC会扫描这个类中的所有注解，当看到@Controller是会生成该controller的Bean，扫描到@RequestMappting注解的时候会将@RequestMappting中的URI和下面的方法形成映射。所以我们请求的URI是“/book/allBool”<br>SpringMVC就会将数据交由BookController类的list方法来处理</p>
+<p>我们仔细观察list方法，里面调用了bookService参数的queryAllBook方法，这里使用到了两个注解@Autowired，@Qualifier，简单介绍下两个注解的作用</p>
+<p>@Autowrite</p>
+<p>作用：自动按照类型注入,只要有唯一的类型匹配就能注入成功，当传入的类型不唯一时，则会报错。</p>
+<p>@Qualiier</p>
+<p>作用：在自动按照类型注入的基础上，在按照bean的id注入。它在给类成员注入数据时，不能独立使用。但是再给方法的形参注入数据的时候，可以独立使用。</p>
+<p>由此可以看到bookService参数的类型是BookService类型，通过注解自动注入的Bean的id叫做BookServiceImpl</p>
+<h2 id="SSM之Spring执行流程"><a href="#SSM之Spring执行流程" class="headerlink" title="SSM之Spring执行流程"></a>SSM之Spring执行流程</h2><p>这里我们就要从SpringMVC的部分过渡到Spring的部分了,所谓的过渡就是我们从SpringMVC的Controller层去调用Service层而这Service就是我们使用Spring进行IOC控制和AOP编程的地方。</p>
+<p>首先我们需要先要去看spring-service.xml这个配置文件，</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/9.png" alt=""></p>
+<p>这里我们看到了一个很重要的东西<br>id为BookServiceImpl的bean，我们可以看到这个bean的class路径是com.kuang.service.BookServiceImpl，</p>
+<p>&lt;bean&gt;这个标签就牵扯到了Spring一大核心功能点 就是IOC(Inversion of<br>Control)控制反转，名字听起来特别唬人，其实特别容易理解，就是本来写一个项目需要我们自己手动去new一个实例出来，用了Spring以后我们至于要把我们需要生成实例的那个类的路径，以及我们在new<br>一个实例时需要传入的的参数，传入参数的方法可以是通过构造方法，也可以通过set方法，我们还可以给这个bean起一个名称来方便我们调用（如果不用id参数之名的话那么这个bean的名称默认为<br>类名开头字母小写，比如BookServiceImpl，如不特别指定，那么生成的bean的名称就是bookServiceImpl）。Spring就会在启动时将这些我们指定好的类生成的实例放入IOC容器中供我们使用，通俗点说就是本来由我们手动生成实例的过程交由Spring来做了，这就是所谓的控制反转。</p>
+<p>接下来我们去看BookServiceImpl这个类的详细信息</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/10.png" alt=""></p>
+<p>首先看到该类是实现了BookService这个接口，ok我们先去看BookService这个接口</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/11.png" alt=""></p>
+<p>可以看到接口中定义了四种方法，为了方便理解，这些方法的名字是对应着日常项目中最长用的操作数据库的四个方法即，增删改查。</p>
+<p>好了，看完了接口我们来看接口的实现类也就是BookServiceImpl。</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/12.png" alt=""></p>
+<p>由于实现了BookService这个接口，自然也就需要实现该接口下的所有方法，我们找到queryAllBook方法，发现queryAllBook调用了bookMapper参数的queryAllBook方法，而bookMapper是BookMapper类型的参数。</p>
+<p>我们回过头来看spring-service.xml中的这一项配置，之前说了这一配置是将BookServiceImpl这个类生成一个bean并放入Spring<br>的IOC容器中，&lt;property&gt;标签的意思是通过该类提供的set方法在bean生成时向指定的参数注入value，name属性就是指定的参数的名称，可以看到我们BookServiceImpl中确实有一个私有参数名叫bookMapper</p>
+<p>并且提供了该属性的set方法，<br>ref属性是指要注入的value是其他的Bean类型，如果传入的是一些基本类型或者String类型就不需要用ref<br>将ref改成value就可以</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/13.png" alt=""></p>
+<p>这里我们可以看到我们通过ref属性向BookServiceImpl这个类中的bookMapper参数注入了一个value，这个value是一个其他的bean类型，这个bean的id叫做bookMapper。此时由于我们Service层的BookServiceImpl的queryAllBook方法的实现方式其实就是调用了id为bookMapper的bean的queryAllBook方法。所以这个id为bookMapper的bean就是程序执行的下一步。</p>
+<h2 id="SSM之Mybatis执行流程"><a href="#SSM之Mybatis执行流程" class="headerlink" title="SSM之Mybatis执行流程"></a>SSM之Mybatis执行流程</h2><p>接下来就是是我们的web三层架构的数据访问层也就是我们Mybaits负责的部分，通常这一部分的包名会叫做xxxdao，也就是开发中常说的dao层，该包下面的类和接口通常都叫做xxxDao或者xxxMapper，当然不遵守这个规范也可以但是不推荐。此时我们的请求要从Spring负责的业务层过渡到Mybatis负责的数据层了，但是Mybaits和Spring的关系不像SpringMVC和Spring的关系一样可以无缝衔接，所以我们需要通过配置文件将Mybatis和Spring关联起来，这里我们看一下pom.xml</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/14.png" alt=""></p>
+<p>可以看到我们导入的包除了Mybatis本身，还倒入了一个mybatis-spring的包，目的就是为了将Mybatis和Spring做结合，spring-dao.xml也就是用来整合Spring和Mybatis的配置文件。</p>
+<p>刚才我们看到Spring启动加载bean时会注入一个id为bookMapper的bean但是我们并未在之前的任何配置文件包括注解中看到有这个bean的相关信息，所以我们接下来要看spring-dao.xml中有没有和这个bean有关的信息</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/15.png" alt=""></p>
+<p>每项配置的作用基本都用注释的方式标明了</p>
+<p>&lt;context:property-placeholder location=”classpath:database.properties”/&gt;</p>
+<p>这里关联了一个properties文件</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/16.png" alt=""></p>
+<p>里面是连接数据库和配置连接池时需要的信息，没什么好说的。</p>
+<p>我们着重看这个配置</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/17.png" alt=""></p>
+<p>这个配置通过生成MapperScannerConfigurer的bean来实现自动扫描com.kuang.dao下面的接口包，然后动态注入到Spring<br>IOC容器中，同样动态注入的bean的id默认为类名（开头字母小写），我们看下到目录下有哪些文件。</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/18.png" alt=""></p>
+<p>我们看到有一个叫BookMapper的接口文件，这样就明白了之前生成BookServiceImpl这个bean是通过&lt;property&gt;也就是通过BookServiceImpl类中的</p>
+<p>public void setBookMapper(BookMapper bookMapper) {</p>
+<p>this.bookMapper = bookMapper;</p>
+<p>}</p>
+<p>方法注入的这个bookMapper是哪里来的了，是由我们配置了MapperScannerConfigurer这个bean后这个bean帮我们扫描dao包下的借口文件并生成bean然后再帮我们注入到Spring的IOC容器中，所以我们才可以在BookServiceImpl这个bean中通过&lt;property&gt;标签注入bookmapper这个bean</p>
+<p>然后我们来看这项配置</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/19.png" alt=""></p>
+<p>这里是生成一个id为sqlSessionFactory的bean，这里就要引出Mybatis中的两个关键对象即sqlSessionFactory和sqlSession。</p>
+<p>简单介绍下这两个对象</p>
+<p>SqlSessionFactory</p>
+<p>SqlSessionFactory是MyBatis的关键对象，它是单个数据库映射关系经过编译后的内存镜像。SqlSessionFactory对象的实例可以通过SqlSessionBuilder对象获得，而SqlSessionBuilder则可以从XML配置文件或一个预先定制的Configuration的实例构建出SqlSessionFactory的实例。SqlSessionFactory是创建SqlSession的工厂。</p>
+<p>SqlSession</p>
+<p>SqlSession是执行持久化操作的对象，类似于JDBC中的Connection。它是应用程序与持久存储层之间执行交互操作的一个单线程对象。SqlSession对象完全包括以数据库为背景的所有执行SQL操作的方法，它的底层封装了JDBC连接，可以用SqlSession实例来直接执行已映射的SQL语句。</p>
+<p>SqlSessionFactory和SqlSession的实现过程：</p>
+<p>mybatis框架主要是围绕着SqlSessionFactory进行的，创建过程大概如下：</p>
+<p>(1)、定义一个Configuration对象，其中包含数据源、事务、mapper文件资源以及影响数据库行为属性设置settings</p>
+<p>(2)、通过配置对象，则可以创建一个SqlSessionFactoryBuilder对象</p>
+<p>(3)、通过 SqlSessionFactoryBuilder 获得SqlSessionFactory 的实例。</p>
+<p>(4)、SqlSessionFactory<br>的实例可以获得操作数据的SqlSession实例，通过这个实例对数据库进行</p>
+<p>如果是spring和mybaits整合之后的配置文件,一般以这种方式实现,SqlSessionFactory的创建:</p>
+<p>&lt;bean id=”sqlSessionFactory” class=”org.mybatis.spring.SqlSessionFactoryBean”&gt;</p>
+<p>&lt;property name=”dataSource” ref=”dataSource”&gt;&lt;/property&gt;</p>
+<p>&lt;property name=”mapperLocations”<br>value=”classpath:com/cn/mapper/*.xml”&gt;&lt;/property&gt;</p>
+<p>&lt;/bean&gt;</p>
+<p>SqlSessionFactoryBean是一个工厂Bean，根据配置来创建SqlSessionFactory</p>
+<p>如果是单独的使用手动创建SqlSessionFactory和SqlSession话流程如下</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/20.png" alt=""></p>
+<p>看完了SqlSessionFactory和SqlSession的基础知识我们同时注意到下面这个&lt;property&gt;标签的value属性，“classpath:mybatis-config.xml”</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/21.png" alt=""></p>
+<p>这里又引入了一个xml配置文件，还记得我上面刚说过spring-dao.xml是用来整合Spring和Mybatis的么？这个mybatis-config.xml就是我们Mybatis的配置文件。</p>
+<p>好了spring-dao.xml这个用来整合Spring和Mybatis的配置文件我们已经了解了，程序按着刚才的请求接着向下走。</p>
+<p>我们刚在走到了BookServiceImpl类的queryAllBook方法，然后该方法又是调用了bookMapper的queryAllBook方法。现在我们清楚了bookMapper的类型是BookMapper</p>
+<p>又从sping-dao.xml的配置文件中看到了该文件的位置位于com.kuang.dao路径下，我们现在就打开BookMapper.java文件看一看</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/22.png" alt=""></p>
+<p>我们注意到这只是个接口，我们都知道接口是不能实例化的接口只是提供一个规范，这是我们就有疑问了，那我们调用的bookMapper的queryAllBook是怎么执行的？</p>
+<p>我们在仔细看下dao目录下的文件，</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/23.png" alt=""></p>
+<p>发现还有一个名字和BookMapper.java名字一样的xml文件，我们打开看一下内容。</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/24.png" alt=""></p>
+<p>看到这个文件，虽然我们对mybatis的了解不多，但是我们应该大概明白了，为什么我们BookMapper明明只是接口，我们却可以实例化生成BookMapper的bean并且可以调用他的方法了。</p>
+<p>但是只有BookMapper.java和BookMapper.xml显然不能就是Mybatis的全部了，两个文件之间此时除了名字相同以外还没有什么直接联系，所以我们还需要关联起来，我们来看看mybatis-config.xml这个Mybatis的配置文件</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/25.png" alt=""></p>
+<p>我们看到了&lt;mappers&gt;这个标签的resource属性的value就是我们BookMapper.xml的路径MyBatis<br>是基于 sql 映射配置的框架，sql 语句都写在 Mapper 配置文件中，当构建 SqlSession<br>类之后，就需要去读取 Mapper 配置文件中的 sql 配置。而&lt;mappers&gt;<br>标签就是用来配置需要加载的 sql 映射配置文件路径的。</p>
+<p>也就是说最终由我们的Spring帮我生成BookMapper的代理对象然后由Mybaits通过&lt;mappers&gt;标签将BookMapper代理对象中的方法和BookMapper.xml中的配置进行一一的映射，并最终执行其中的Sql语句。</p>
+<p>我们看到我们此次请求最终调用的BookMapper的queryAllBook方法，这时我们就需要去BookMapper.xml去寻找与之对应的Sql语句了</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/26.png" alt=""></p>
+<p>很容易就找到了</p>
+<p>我们看到最后执行的sql语句是</p>
+<p>SELECT * from ssmbuild.books</p>
+<p>至此我们的请求已经完成从一开始的由DispatcherServlet这个前端控制器派发给SpringMVC并最终通过Mybatis<br>执行我们需要对数据库进行的操作。</p>
+<p>生产环境的业务代码，会比这个Demo复杂，但是整体的执行流程和思路并不会有什么太大的变化，所以审计思路也是如此。</p>
+<p>SSM框架有三种配置方式，即全局采用xml配置文件的形式，全局采取注解的配置方式，或者注解和xml配置文件配合使用的方式，区别只是在于写法不一样，执行流程不会因此发生太多改变。</p>
+<h2 id="审计的重点filter过滤器"><a href="#审计的重点filter过滤器" class="headerlink" title="审计的重点filter过滤器"></a>审计的重点filter过滤器</h2><p>此时在将web.xml时还有一个标签说放在后面讲，就是web.xml的&lt;filter&gt;标签</p>
+<p>SpringMVC时构建于Servlet之上的，所以Servlet中的过滤器自然也是可以使用，只不过不能配置在spring-mvc.xml中，而是要直接配置在web.xml中，因为是属于Servlet的技术嘛。</p>
+<p>我们重回web.xml</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/27.png" alt=""></p>
+<p>为了方便之前的讲解，我将这两个filter注释掉了。也就是说这两个filter并没有生效。我们以下面的filter-name为XSSEscape的filter来进行讲解。</p>
+<p>首先我们此时程序是没有XSS防护的，所以存在存储型XSS漏洞，我们来尝试存储型XSS攻击</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/28.png" alt=""></p>
+<p>我们点击新增功能</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/29.png" alt=""></p>
+<p>看一下提交路径</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/30.png" alt=""></p>
+<p>去后台找与之对应的方法</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/31.png" alt=""></p>
+<p>找到后在这里下断点看传入参数的详细信息</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/32.png" alt=""></p>
+<p>看到没有任何过滤XSS语句就这么直接传了进来</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/33.png" alt=""></p>
+<p>如果我们此时想要防御这个XSS攻击就可以在web.xml中配置上我们的&lt;filter&gt;</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/34.png" alt=""></p>
+<p>这里声明了了我在com.kuang.filter的包路径下又一个类叫XssFilter是一个过滤器</p>
+<p>下面的&lt;dispatcher&gt;属性中的REQUEST的意思是</p>
+<p>只要发起的操作是一次HTTP请求，比如请求某个URL、发起了一个GET请求、表单提交方式为POST的POST请求、表单提交方式为GET的GET请求。一次重定向则前后相当于发起了两次请求，这些情况下有几次请求就会走几次指定过滤器。</p>
+<p>&lt;dispatcher&gt;属性2.4版本的servlet中添加的新的属性标签，总共有四个值REQUEST,FORWARD,INCLUDE和ERROR，以下把这四个值简单说明一下</p>
+<p>1、REQUEST</p>
+<p>只要发起的操作是一次HTTP请求，比如请求某个URL、发起了一个GET请求、表单提交方式为POST的POST请求、表单提交方式为GET的GET请求。一次重定向则前后相当于发起了两次请求，这些情况下有几次请求就会走几次指定过滤器。</p>
+<p>2、FOWARD</p>
+<p>只有当当前页面是通过请求转发转发过来的情形时，才会走指定的过滤器</p>
+<p>3、INCLUDE</p>
+<p>只要是通过&lt;jsp:include page=”xxx.jsp”<br>/&gt;，嵌入进来的页面，每嵌入的一个页面，都会走一次指定的过滤器。</p>
+<p>4、ERROR</p>
+<p>假如web.xml里面配置了&lt;error-page&gt;&lt;/error-page&gt;：</p>
+<p>例如</p>
+<p>&lt;error-page&gt;</p>
+<p>&lt;error-code&gt;400&lt;/error-code&gt;</p>
+<p>&lt;location&gt;/filter/error.jsp&lt;/location&gt;</p>
+<p>&lt;/error-page&gt;</p>
+<p>意思是HTTP请求响应的状态码只要是400、404、500三种状态码之一，容器就会将请求转发到error.jsp下，这就触发了一次error，走进了配置的DispatchFilter。需要注意的是注意一点的是，虽然把请求转发到error.jsp是一次forward的过程，但是配置成&lt;dispatcher&gt;FORWARD&lt;/dispatcher&gt;并不会走DispatchFilter这个过滤器。</p>
+<p>这四种dispatcher方式可以单独使用，也可以组合使用，配置多个&lt;dispatcher&gt;&lt;/dispatcher&gt;<br>即可。</p>
+<p>在审计的时候的过滤器&lt;dispatcher&gt;属性中使用的值也是我们关注的一个点，</p>
+<p>&lt;url-pattern&gt;属性是指明我们要过滤访问哪些资源的请求，“/*”的意思就是拦截所有对后台的请求,<br>包括对一个简单的对jsp页面的GET请求，同时我们可以具体的指定拦截对某一资源的请求，同时也可以设置对某些资源的请求不过滤单独进行放过，</p>
+<p>举例说明</p>
+<p>&lt;filter&gt;</p>
+<p>&lt;filter-name&gt;XSSEscape&lt;/filter-name&gt;</p>
+<p>&lt;filter-class&gt;com.springtest.filter.XssFilter&lt;/filter-class&gt;</p>
+<p>&lt;/filter&gt;</p>
+<p>&lt;filter-mapping&gt;</p>
+<p>&lt;filter-name&gt;XSSEscape&lt;/filter-name&gt;</p>
+<p>&lt;url-pattern&gt;/com/app/UserControl&lt;/url-pattern&gt;</p>
+<p>&lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;</p>
+<p>&lt;/filter-mapping&gt;</p>
+<p>既然等指定单独过滤特定资源，自然也就可以指定对特定资源的放行。</p>
+<p>如果设置全局的资源请求过滤的话肯定是不合理的，生产环境中又很多静态资源是不需要进行过滤的，所以我们可以指定将这些资源进行放行，</p>
+<p>例如</p>
+<p>&lt;filter&gt;</p>
+<p>&lt;filter-name&gt; XSSEscape &lt;/filter-name&gt;</p>
+<p>&lt;filter-class&gt; com.springtest.filter.XssFilter &lt;/filter-class&gt;</p>
+<p>&lt;init-param&gt;</p>
+<p>&lt;!– 配置不需要被登录过滤器拦截的链接，只支持配后缀、前缀<br>及全路径，多个配置用逗号分隔 –&gt;</p>
+<p>&lt;param-name&gt;excludedPaths&lt;/param-name&gt;</p>
+<p>&lt;param-value&gt;/pages/*,*.html,*.js,*.ico&lt;/param-value&gt;</p>
+<p>&lt;/init-param&gt;</p>
+<p>&lt;/filter&gt;</p>
+<p>&lt;filter-mapping&gt;</p>
+<p>&lt;filter-name&gt; XSSEscape &lt;/filter-name&gt;</p>
+<p>&lt;url-pattern&gt;/*&lt;/url-pattern&gt;</p>
+<p>&lt;/filter-mapping&gt;</p>
+<p>这样我们的serlvet在路径选择时当有对 html js<br>和ico资源发起的请求就不回在将改请求转发至XssFilter类。</p>
+<p>我们在审计代码时<br>这里也是需要注意的一个点，因为有可能开发人员的错误配置导致本应该经过过滤器的请求，错误的给直接放行了，这样即使项目中有过滤器，也是不会生效的。</p>
+<p>明白了&lt;filter&gt;标签的作用我们就去看XssFilter这个类的内容</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/35.png" alt=""></p>
+<p>可以看到filter包下有两个java类，我们先看XssFilter这个类</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/36.png" alt=""></p>
+<p>可以看到我们的XssFilter这个类实现了一个叫Filter的接口</p>
+<p>我们去看一下Filter接口的源码</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/37.png" alt=""></p>
+<p>可以看到Filter所属的包是javax.servlet</p>
+<p>Filter是Servlet的三大组件之一</p>
+<p>javax.servlet.Filter 是一个接口，过滤请求，实现请求的拦截或者放行，并且添加新的功能</p>
+<p>众所周知接口其实就是一个标准，所以我们想要编写自己的过滤器自然也要遵守这个标准即实现Filter这个接口。</p>
+<p>Filter接口中有三个方法，这里简单介绍一下</p>
+<p>init方法：</p>
+<p>在创建完过滤器对象之后被调用。只执行一次</p>
+<p>doFilter方法：</p>
+<p>执行过滤任务方法。执行多次。</p>
+<p>destroy方法：</p>
+<p>Web服务器停止或者Web应用重新加载，销毁过滤器对象。</p>
+<p>当 Servlet 容器开始调用某个 Servlet 程序时，如果发现已经注册了一个 Filter<br>程序来对该 Servlet 进行拦截，那么容器不再直接调用 Servlet 的 service<br>方法，而是调用 Filter 的 doFilter 方法，再由 doFilter 方法决定是否去激活 service<br>方法</p>
+<p>不难看出需要我们重点关注的方法是doFilter方法</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/38.png" alt=""></p>
+<p>这里的request的参数和response参数可以理解成封装了请求数据和相应数据的对象，我们需要过滤的数据就是存放在这两个对象中，</p>
+<p>最后一个参数FilterChain，通过名字我们猜这个参数是一个过滤链，查看一下FilterChain的源码</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/39.png" alt=""></p>
+<p>看到FilterChain是一个接口，而且这个接口只有一个方法，那就是doFilter方法，FilterChain参数存在的意义就在于，在一个<br>Web 应用程序中可以注册多个 Filter 程序，每个 Filter 程序都可以对一个或一组<br>Servlet 程序进行拦截。如果有多个 Filter 程序都可以对某个 Servlet<br>程序的访问过程进行拦截，当针对该 Servlet 的访问请求到达时，Web 容器将把这多个<br>Filter 程序组合成一个 Filter 链（也叫过滤器链），</p>
+<p>Filter 链中的各个 Filter 的拦截顺序与它们在 web.xml 文件中的映射顺序一致，上一个<br>Filter.doFilter 方法中调用 FilterChain.doFilter 方法将激活下一个<br>Filter的doFilter 方法，最后一个 Filter.doFilter 方法中调用的<br>FilterChain.doFilter 方法将激活目标 Servlet的service 方法</p>
+<p>只要 Filter 链中任意一个 Filter 没有调用 FilterChain.doFilter 方法，则目标<br>Servlet 的 service 方法都不会被执行</p>
+<p>介绍完FilterChain接下来大家应该发现，虽然名字叫过滤器</p>
+<p>但是调用chain.dofilter方法似乎并没有执行任何类似过滤的工作，没有看到任何类似黑名单或者白名单的过滤规则</p>
+<p>在调用chain.dofilter方法时我们传递了两个参数进去</p>
+<p>new XSSRequestWrapper((HttpServletRequest) request)和response</p>
+<p>这就是说我们传递了一个XSSRequestWrapper对象和ServletRespons对象，我们关心的当然是这个XSSRequestWrapper</p>
+<p>在传递参数的过程中我们通过调用XSSRequestWrapper的构造器，传递了HttpServletRequest对象，这里简单从继承关系让大家看一下HttpServletRequest和ServletRequest的关系</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/40.png" alt=""></p>
+<p>既然这里生成了一个XSSRequestWrapper对象并传入的参数那我们自然要跟进一探究竟</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/41.png" alt=""></p>
+<p>正好filter下面有一个叫XSSRequestWrapper的类，我们看一下代码</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/42.png" alt=""></p>
+<p>看到这里大家应该恍然大悟，原来过滤的行为是在这里进行了，而XssFilter的存在只是在链式执行过滤器并最终将值传给Servlet时调用XSSRequestWrapper来进行过滤并获取过滤结果而已。</p>
+<p>这里对过滤规则就不过多赘述，网上有很多好的过滤规则，这里就不多提了。</p>
+<p>这里肯定有很多人并明白问什么不将过滤的逻辑代码写在XssFilter中而是又新写了一个类，不是多此一举么？</p>
+<p>这么做当然不是多此一举，首先解耦这个理由就已经足够充分了，其次我们看到XSSRequestWrapper继承了一个类<br>HttpServletRequestWrapper</p>
+<p>这里我们看一下HttpServletRequestWrapper类的继承关系</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/43.png" alt=""></p>
+<p>我们可以看到HttpServletRequestWrapper是实现了HttpServletRequest接口的，我们这里提一下过滤这个概念，我们的想法是尽可能的把请求中的有危害的数据或者特殊符号过滤掉，然后将过滤后的数据转发向后面的业务代码并继续执行，而不是说发现请求数据中有特殊字符就直接停止执行，抛出异常，返回给用户一个400页面，所以既然要继续执行，那我们就要去修改或者转义HttpServletRequest对象中的恶意数据或者特殊字符。然而HttpServletRequest对象中的数据是不允许被修改的，也就是说HttpServletRequest对象没有提供给我们直接修改请求数据的方法。</p>
+<p>此时矛盾就来了，我们想要修改但是HttpServletRequest对象又不给提供，所以HttpServletRequestWrapper这个类就出现了，这里用到了常见的23中设计模式之一的装饰者模式，限于篇幅原因不可能对装饰者模式在进行讲解了，感兴趣的同学可以自己去研究。也就是说HttpServletRequestWrapper这个类的出现就是为了给我们提供修改request请求数据的方法的，到这里大家应该就明白了为什么需要单写一个类来进行过滤的行为，不是我们想着么写，而是框架就这么设计的，为的就是解耦。</p>
+<p>此时当HttpServletRequestWrapper将请求中的数据过滤完，并修改完成后返回然后作为chain.doFilter方法的形参进行传递。</p>
+<p>结合之前说的，最后一个 Filter.doFilter 方法中调用的 FilterChain.doFilter<br>方法将激活目标 Servlet的service 方法</p>
+<p>由于我们没有配置第二个Filter所以XssFilter中的chain.doFilter将会激活我们Servlet的service方法即DispatcherServlet的service方法，然后数据将传入我们的SpringMVC的Controller层交由我们的BookController来处理。</p>
+<p>我们这次使用filter来演示一下效果</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/44.png" alt=""></p>
+<p>老地方下断</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/45.png" alt=""></p>
+<p>然后再次执行到这里时XSS语句中的特殊字符已经被Filter转义。</p>
+<p><img src="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/46.png" alt=""></p>
+<p>自然也就不会存在Xss的问题了。</p>
+<h1 id="SSM框架审计思路总结"><a href="#SSM框架审计思路总结" class="headerlink" title="SSM框架审计思路总结"></a>SSM框架审计思路总结</h1><h2 id="思路总结"><a href="#思路总结" class="headerlink" title="思路总结"></a>思路总结</h2><p>最后总结一下SSM框架的审计思路，审计思路其实就是我们代码的执行思路</p>
+<p>和审计非SSM框架代码的主要区别就是在于SSM框架的各种XML配置，和注解配置，需要我们根据XML中的配置和注解来查看代码的执行路径，SSM框架中常见的注解和注解中的属性，以及常见的标签和标签的各个属性。</p>
+<p>审计漏洞的方式同正常的java代码审计没有区别，网上有很多非常优秀的java代码审计文章，关于每个漏洞的审计方式写的都非常全面，我们需要的就只是将其移植到SSM框架的审计中来，我们明白SSM的执行流程了，自然就明白了该怎么在SSM框架中跟踪参数，例如刚刚讲的XSS漏洞，我们根据XML中的配置和注解中的配置一路跟到了Mybatis的mapper.xml这个映射文件，找到了最中执行的</p>
+<p>insert into ssmbuild.books(bookName,bookCounts,detail)</p>
+<p>values (#{bookName}, #{bookCounts}, #{detail})</p>
+<p>这个sql语句，发现我们传入的books参数直到sql语句执行的前一刻都没有经过任何的过滤处理，所以此处插入数据库的参数自然是不可信的脏数据。</p>
+<p>当我们再次查询这条数据并返回到前端时就非常可能造成存储型XSS攻击</p>
+<p>我们在审计这类漏洞时，最简单的方法就是先去web.xml中去查看有没有配置相关的过滤器，如果有哪我们就去看看过滤器的规则是否严格，如果没有那就很有可能存在漏洞。</p>
+<h2 id="补充知识"><a href="#补充知识" class="headerlink" title="补充知识"></a>补充知识</h2><p>最后还要提一个必要重要的Mybaits知识点就是Mybatis的预编译，关于java的预编译简单介绍一下</p>
+<p>非预编译的情况下我们每次执行sql都需要将slq和参数拼接在一起然后传给数据库编译执行，这样采用拼接的方式非常容易产生SQL注入漏洞，当然可以使用filter对参数进行过滤来避免产生SQL注入，</p>
+<p>而在预编译的情况下，程序会提前将我们的sql语句编译好，程序执行的时候只需要将传递进来的参数交由数据库进行操作就可以了，此时不论传来的参数是什么，都不会被当成时SQL语句的一部分，因为真正的SQL语句已经提前编译好了，所以即使不过滤也不会产生SQL注入这类漏洞，</p>
+<p>以下面这个mapper.xml中的SQL语句举例</p>
+<p>insert into ssmbuild.books(bookName,bookCounts,detail)</p>
+<p>values (#{bookName}, #{bookCounts}, #{detail})</p>
+<p>#{bookName}这种形式的就是采用了预编译的形式传参，而以下这种形式</p>
+<p>insert into ssmbuild.books(bookName,bookCounts,detail)</p>
+<p>values (‘${bookName}’,’${bookCounts}’, ‘${detail}’)</p>
+<p>‘${bookName}’这种写法就是没有使用预编译的形式进行传参数，此时如果不对传入的参数进行过滤和校验的话就会产生SQL注入漏洞</p>
+<p>‘${xxxx}’和#{xxxx}其实就是jdbc的Statement和PreparedStatement对象。</p>
+<h2 id="学习建议"><a href="#学习建议" class="headerlink" title="学习建议"></a>学习建议</h2><p>整篇文章对SSM框架的整个执行流程和审计流程进行了简单的讲解，后续想要增强SSM框架的审计水平，推荐大家自己上手一些简单SSM框架搭建的项目，实战永远是最快的学习方式，大家在审计SSM框架可能遇到的最大的困难就是有很多新的之前没有碰到过的注解，和XML中一些SSM独有的标签，这些注解和标签数量很多，没有办法在一篇文章中讲完，大家碰到不懂的注解和标签都可以通过官方提供的文档和搜索引擎来寻找答案。</p>
+<p>最后感谢大家的耐心观看。</p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <i class="fas fa-exclamation-circle"></i>
+            在法律允许的范围内，
+            <a href="http://LinShiG0ng.github.io">
+                有关部门临时工
+            </a>
+            在天融信阿尔法实验室工作期间创作
+            <a  href="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/">
+                《Java框架级SSM代码审计思路》
+            </a>
+            。此作品发布在：
+            <span property="vcard:Country" datatype="dct:ISO3166"
+                content="CN" about="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/">
+                天融信阿尔法实验室官方公众号及其各大论坛官方账号
+            </span>
+            </p>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Java/">
+                                    <span class="chip bg-color">Java</span>
+                                </a>
+                            
+                                <a href="/tags/Web%E5%AE%89%E5%85%A8/">
+                                    <span class="chip bg-color">Web安全</span>
+                                </a>
+                            
+                                <a href="/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/">
+                                    <span class="chip bg-color">代码审计</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2020/05/31/cve-2019-19781-yuan-cheng-dai-ma-zhi-xing-lou-dong-shen-ru-fen-xi/">
+                    <div class="card-image">
+                        
+                        <img src="http://img0.pconline.com.cn/pconline/1307/01/3362836_20120619060136111.jpg" class="responsive-img" alt="CVE-2019-19781远程代码执行漏洞深入分析">
+                        
+                        <span class="card-title">CVE-2019-19781远程代码执行漏洞深入分析</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            CVE-2019-19781远程代码执行漏洞深入分析
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2020-05-31
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            有关部门临时工
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Java/">
+                        <span class="chip bg-color">Java</span>
+                    </a>
+                    
+                    <a href="/tags/Web%E5%AE%89%E5%85%A8/">
+                        <span class="chip bg-color">Web安全</span>
+                    </a>
+                    
+                    <a href="/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/">
+                        <span class="chip bg-color">代码审计</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/">
+                    <div class="card-image">
+                        
+                        <img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1590929671991&di=a0a8c3ee08b978441dee75770d2e4e11&imgtype=0&src=http%3A%2F%2Fimage.blog.zhouchenxi.cn%2F2017%2F07%2F20170706174321_51327.png" class="responsive-img" alt="Apache Solr Velocity模板注入漏洞深度分析">
+                        
+                        <span class="card-title">Apache Solr Velocity模板注入漏洞深度分析</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            Apache Solr是一个强大的搜索服务器，它支持像API一样的REST。 Solr由Lucene提供支持，可以实现强大的匹配功能，例如短语，通配符，连接，分组和更多的各种数据类型。 它是高度优化的高流量使用Apache Zookeeper。
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2020-05-31
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            有关部门临时工
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Java/">
+                        <span class="chip bg-color">Java</span>
+                    </a>
+                    
+                    <a href="/tags/Web%E5%AE%89%E5%85%A8/">
+                        <span class="chip bg-color">Web安全</span>
+                    </a>
+                    
+                    <a href="/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/">
+                        <span class="chip bg-color">代码审计</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+<!-- 代码块折行 -->
+
+<style type="text/css">
+code[class*="language-"], pre[class*="language-"] { white-space: pre !important; }
+</style>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="tencent"
+                   type="search"
+                   id="岁月神偷"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='none'
+                   order='list'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            <span id="year">2019</span>
+            <a href="http://LinShiG0ng.github.io" target="_blank">有关部门临时工</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                class="white-color">19.1k</span>&nbsp;字
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/linshig0ng" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:450956259@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=450956259" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 450956259" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc("/search.xml", 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <script type="text/javascript" src="/libs/background/ribbon-dynamic.js" async="async"></script>
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>

@@ -42,7 +42,7 @@
                     
                     <img src="/medias/logo.png" class="logo-img" alt="LOGO">
                     
-                    <span class="logo-span">Hexo</span>
+                    <span class="logo-span">有关部门临时工</span>
                 </a>
             </div>
             
@@ -312,7 +312,7 @@
         <div class="brand">
             <div class="title center-align">
                 
-                    subtitle
+                Temporary worker‘s Blog
                 
             </div>
 
@@ -358,10 +358,61 @@
             </div>
             <div class="tag-chips">
                 
+                
+                <a href="/tags/Java/" title="Java: 3">
+                    <span class="chip center-align waves-effect waves-light
+                             chip-default "
+                            data-tagname="Java" style="background-color: #F9EBEA;">Java
+                        <span class="tag-length">3</span>
+                    </span>
+                </a>
+                
+                
+                <a href="/tags/Web%E5%AE%89%E5%85%A8/" title="Web安全: 3">
+                    <span class="chip center-align waves-effect waves-light
+                             chip-default "
+                            data-tagname="Web安全" style="background-color: #F5EEF8;">Web安全
+                        <span class="tag-length">3</span>
+                    </span>
+                </a>
+                
+                
+                <a href="/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/" title="代码审计: 3">
+                    <span class="chip center-align waves-effect waves-light
+                             chip-default "
+                            data-tagname="代码审计" style="background-color: #D5F5E3;">代码审计
+                        <span class="tag-length">3</span>
+                    </span>
+                </a>
+                
             </div>
         </div>
     </div>
 </div>
+
+    
+    <link rel="stylesheet" type="text/css" href="/libs/jqcloud/jqcloud.css">
+<style type="text/css">
+    #tag-wordcloud {
+        width: 100%;
+        height: 300px;
+    }
+</style>
+
+<div class="container" data-aos="fade-up">
+    <div class="card">
+        <div id="tag-wordcloud" class="card-content"></div>
+    </div>
+</div>
+
+<script type="text/javascript" src="/libs/jqcloud/jqcloud-1.0.4.min.js"></script>
+<script type="text/javascript">
+    
+
+    $('#tag-wordcloud').jQCloud([{"text":"Java","weight":3,"link":"http://linshig0ng.github.io/tags/Java/"},{"text":"Web安全","weight":3,"link":"http://linshig0ng.github.io/tags/Web安全/"},{"text":"代码审计","weight":3,"link":"http://linshig0ng.github.io/tags/代码审计/"}], {
+        autoResize: true
+    });
+</script>
 
     
 
@@ -428,7 +479,7 @@
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">267</span>&nbsp;字
+                class="white-color">19.1k</span>&nbsp;字
             
             
             

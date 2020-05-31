@@ -2,11 +2,11 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
   <title>Hexo</title>
   
-  
+  <subtitle>Temporary worker‘s Blog</subtitle>
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://linshig0ng.github.io/"/>
-  <updated>2020-05-30T16:18:04.514Z</updated>
+  <updated>2020-05-31T10:07:26.170Z</updated>
   <id>http://linshig0ng.github.io/</id>
   
   <author>
@@ -17,11 +17,11 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>test</title>
-    <link href="http://linshig0ng.github.io/2020/05/30/test/"/>
-    <id>http://linshig0ng.github.io/2020/05/30/test/</id>
-    <published>2020-05-30T15:57:42.000Z</published>
-    <updated>2020-05-30T16:18:04.514Z</updated>
+    <title>CVE-2019-19781远程代码执行漏洞深入分析</title>
+    <link href="http://linshig0ng.github.io/2020/05/31/cve-2019-19781-yuan-cheng-dai-ma-zhi-xing-lou-dong-shen-ru-fen-xi/"/>
+    <id>http://linshig0ng.github.io/2020/05/31/cve-2019-19781-yuan-cheng-dai-ma-zhi-xing-lou-dong-shen-ru-fen-xi/</id>
+    <published>2020-05-31T08:36:13.000Z</published>
+    <updated>2020-05-31T10:07:26.170Z</updated>
     
     <summary type="html">
     
@@ -29,14 +29,80 @@
       
         
         
-          &lt;p&gt;&lt;img src=&quot;/2020/05/30/test/ysoserial.png&quot; alt=&quot;ysoserial&quot;&gt;&lt;/p&gt;
-&lt;pre class=&quot; language-java&quot;&gt;&lt;code class=&quot;language-java&quot;&gt;&lt;span
+          &lt;h1 id=&quot;CVE-2019-19781远程代码执行漏洞深入分析&quot;&gt;&lt;a href=&quot;#CVE-2019-19781远程代码执行漏洞深入分析&quot; class=&quot;headerlink&quot;
         
       
     
     </summary>
     
     
+    
+      <category term="Java" scheme="http://LinShiG0ng.github.io/tags/Java/"/>
+    
+      <category term="Web安全" scheme="http://LinShiG0ng.github.io/tags/Web%E5%AE%89%E5%85%A8/"/>
+    
+      <category term="代码审计" scheme="http://LinShiG0ng.github.io/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Java框架级SSM代码审计思路</title>
+    <link href="http://linshig0ng.github.io/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/"/>
+    <id>http://linshig0ng.github.io/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/</id>
+    <published>2020-05-30T17:24:13.000Z</published>
+    <updated>2020-05-31T05:25:37.160Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;p&gt;&lt;strong&gt;Java框架级SSM代码审计思路&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;#ssm框架简介&quot;&gt;1 SSM框架简介 1&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;#springmvc&quot;&gt;1.1 SpringMVC 2&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a
+        
+      
+    
+    </summary>
+    
+    
+    
+      <category term="Java" scheme="http://LinShiG0ng.github.io/tags/Java/"/>
+    
+      <category term="Web安全" scheme="http://LinShiG0ng.github.io/tags/Web%E5%AE%89%E5%85%A8/"/>
+    
+      <category term="代码审计" scheme="http://LinShiG0ng.github.io/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Apache Solr Velocity模板注入漏洞深度分析</title>
+    <link href="http://linshig0ng.github.io/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/"/>
+    <id>http://linshig0ng.github.io/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/</id>
+    <published>2020-05-30T17:24:13.000Z</published>
+    <updated>2020-05-31T10:07:10.702Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h1 id=&quot;Apache-Solr-Velocity模板注入漏洞深度分析&quot;&gt;&lt;a href=&quot;#Apache-Solr-Velocity模板注入漏洞深度分析&quot; class=&quot;headerlink&quot; title=&quot;Apache Solr
+        
+      
+    
+    </summary>
+    
+    
+    
+      <category term="Java" scheme="http://LinShiG0ng.github.io/tags/Java/"/>
+    
+      <category term="Web安全" scheme="http://LinShiG0ng.github.io/tags/Web%E5%AE%89%E5%85%A8/"/>
+    
+      <category term="代码审计" scheme="http://LinShiG0ng.github.io/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/"/>
     
   </entry>
   

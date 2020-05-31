@@ -1,0 +1,1598 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="Apache Solr">
+    <meta name="description" content="">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>Apache Solr Velocity模板注入漏洞深度分析 | Hexo</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<meta name="generator" content="Hexo 4.2.1"><link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">有关部门临时工</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>留言板</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">Hexo</div>
+        <div class="logo-desc">
+            
+            Never really desperate, only the lost of the soul.
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			留言板
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/LinShiG0ng" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/LinShiG0ng" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1590929671991&di=a0a8c3ee08b978441dee75770d2e4e11&imgtype=0&src=http%3A%2F%2Fimage.blog.zhouchenxi.cn%2F2017%2F07%2F20170706174321_51327.png')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">Apache Solr Velocity模板注入漏洞深度分析</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        height: calc(100vh - 250px);
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    .toc-fixed .toc-link::before{
+        position: fixed!important;/*当toc的位置改为fixed时，.toc-link::before也要改为fixed*/
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #toc-content .is-active-link::before {
+        background-color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/Java/">
+                                <span class="chip bg-color">Java</span>
+                            </a>
+                        
+                            <a href="/tags/Web%E5%AE%89%E5%85%A8/">
+                                <span class="chip bg-color">Web安全</span>
+                            </a>
+                        
+                            <a href="/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/">
+                                <span class="chip bg-color">代码审计</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2020-05-31
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2020-05-31
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    7.3k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    26 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h1 id="Apache-Solr-Velocity模板注入漏洞深度分析"><a href="#Apache-Solr-Velocity模板注入漏洞深度分析" class="headerlink" title="Apache Solr Velocity模板注入漏洞深度分析"></a>Apache Solr Velocity模板注入漏洞深度分析</h1><p>漏洞分析环境搭建</p>
+<p>需要工具</p>
+<p>IDEA</p>
+<p>Apache Ant</p>
+<p>Apache Solr8.2.0源码</p>
+<p>Apache Solr8.2.0服务端</p>
+<p>Chrome</p>
+<p>Burp</p>
+<h2 id="1-Apache-solr简介和漏洞复现"><a href="#1-Apache-solr简介和漏洞复现" class="headerlink" title="1  Apache solr简介和漏洞复现"></a>1  Apache solr简介和漏洞复现</h2><p>首先先简单介绍一下Apache Solr</p>
+<p>Apache Solr是一个强大的搜索服务器，它支持像API一样的REST。 Solr由Lucene提供支持，可以实现强大的匹配功能，例如短语，通配符，连接，分组和更多的各种数据类型。 它是高度优化的高流量使用Apache Zookeeper。</p>
+<p>介绍完Apache Solr之后我们就来复现一下这次的 Apache Solr Velocity服务端模板注入漏洞</p>
+<p>我们首先从Apache Solr官网上下载Apache Solr 8.2.0的服务端</p>
+<p><a href="https://mirrors.tuna.tsinghua.edu.cn/apache/lucene/solr/8.2.0/solr-8.2.0.tgz" target="_blank" rel="noopener">https://mirrors.tuna.tsinghua.edu.cn/apache/lucene/solr/8.2.0/solr-8.2.0.tgz</a></p>
+<p>下载完成之后解压</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/1.png" alt=""></p>
+<p>我们通过命令行终端进入bin目录然后输入“./solr start”命令</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/2.png" alt="2"></p>
+<p>Apache Solr就会默认在本地的8983端口启动服务,</p>
+<p>我们访问一下地址 <a href="http://127.0.0.1:8983/solr/#/" target="_blank" rel="noopener">http://127.0.0.1:8983/solr/#/</a></p>
+<p>查看左侧的Core Selector的集合名称</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/3.png" alt="3"></p>
+<p>使用burp Repeater模块像服务端发包修改指定集合的配置</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/4.png" alt="4"></p>
+<p>修改配置成功</p>
+<p>然后发送事先构造好的playload</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/5.png" alt="5"></p>
+<p>漏洞复现成功</p>
+<h2 id="2-模板引擎简介"><a href="#2-模板引擎简介" class="headerlink" title="2  模板引擎简介"></a>2  模板引擎简介</h2><h3 id="2-1-JSP简介"><a href="#2-1-JSP简介" class="headerlink" title="2.1 JSP简介"></a>2.1 JSP简介</h3><p>漏洞复现完成，但是分析漏洞我们还需要一些前置知识，比如什么是模板注入漏洞，以及Velocity究竟是什么，</p>
+<p>我们都知道，现在web开发讲究的是一个前后端分离的方式，MVC模式就是其经典的代表。如果抛弃前后端分离，仅仅开发一个能用的网站，只需要一个JSP其实就够了，但是这样很明显会导致开发时逻辑及其混乱，以及后期维护起来成本极高的问题，这样的开发完全违背的我们java这么一个面向对象语言优雅的编程思维。</p>
+<p>我们在开发一个程序时希望的就是一个模块尽量是独立完成某一个功能而不依赖别的模块的，也就是我们的高内聚，低耦合的思想。</p>
+<p>这种思想用到我们的web开发的架构时，就有了我们的MVC模式，即 Mode，</p>
+<p>View，Controller。和我们的web三层架构，即表示层，业务逻辑层，和数据接口层。尽量保证每一层都是独立可用的,在这里特别提示一下，web三层架构是java独有的概念，而MVC架构则是通用的。</p>
+<p>在这种情况下，每一层都出现了其相对应开源组件。</p>
+<p>首先不得不提的两个使用量最高的MVC框架，Struts2，和SpringMVC。</p>
+<p>表现层有我们的JSP和Thymeleaf，Velocity，Freemarker等模板引擎</p>
+<p>业务层由我们最火热的开源组件Spring</p>
+<p>数据层就有我们最常见的Mybaits和Hibernate两个Dao层框架</p>
+<p>而这次我们要重点注意的就是位于我们的表现层，也就是我们的Velocity模板引擎。 </p>
+<p>对于web不太熟悉的同学可能暂时还不能理解什么是模板引擎，或者说模板引擎是做什么用的。但是相信大家都听过JSP， </p>
+<p>JSP的全称是Java Server Package，与普通的静态html页面相比，区别在于我们可以在JSP页面上书写java代码，以实现和用户进行交互，从而达到动态的这么一个效果。</p>
+<p>JSP一开始出现的时候是同时兼具前端和后端的作用，也就是说如果只是开发一个勉强能用的java动态网站，jsp其实就足够了。</p>
+<p>在JSP出现之前，实现动态页面的效果用的是Servlet的技术，Servlet可以很好的实现接受用户传来的参数并进行处理。但是把数据返回到前端并输出html页面时确异常的麻烦和痛苦。同常需要一行一行的输出html代码，像下面这样</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/6.png" alt="6"></p>
+<p>后来JSP出现了，如果说Servlet是java代码中写HTML的话，那Jsp就是HTML中穿插写java代码了，jsp相比于Servlet来说并不是一个新的技术，jsp是Servlet的一个扩展，其本质仍是Servlet,</p>
+<p>我们看一个最简单的JSP页面</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/7.png" alt="7"></p>
+<p>看起来就是一个普通的HTML页面，为什么我会说jsp的本质是Servlet呢？</p>
+<p>当我们将项目编译打成war包部署在Tomcat下时，会放在Tomcat的WebApp目录下，里面有我们的项目后台的java文件编译成的.class文件。同时也有我们的jsp文件。</p>
+<p>但是我们的jsp文件是不能直接被解析的，Jsp不像HTML拿来就能直接返返回给客户，因为jsp文件中是包含有java代码的，浏览器又不能解析我们jsp页面上的java代码，所以将jsp编译成浏览器能解析的html页面的工作就交由了我们的Tomcat来做 </p>
+<p>当我们启动Tomcat时第一次访问我们的这个jsp页面，往往速度都会稍微慢一些，往后在访问时速度就会很快。这是因为，第一访问时，Tomcat会在他的根目录的work/Catalina/localhos目录下生成我们对应项目名称的一个文件夹。</p>
+<p>并生成一个名称为org.apache.jsp的一个package，我们去观察一下</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/8.png" alt="8"></p>
+<p>我们可以看到一个java文件和一个.class文件。还记得我刚刚才说过jsp的本质其实就是Servlet么？我们点开这个java文件来一探究竟。</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/9.png" alt="9"></p>
+<p>我们从中观察到这这么几个重点</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/10.png" alt="10"></p>
+<p>首先这是一个java类，它继承了HttpJspBase类同时实现了两个接口</p>
+<p>第二个重点在这里</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/11.png" alt="11"></p>
+<p>这是一个静态代码块，静态代码块在类进行加载时就会执行，先于构造代码块和构造方法，是一个java类中最先被执行的代码。</p>
+<p>我们根据其代码内容不难看出这静态代码块的作用是用来import Java类的。</p>
+<p>接下来是一个名叫_jspService的函数，是不是特别像servlet的doGET和doPost方法？</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/12.png" alt="12"></p>
+<p>最后我们在看这里</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/13.png" alt="13"></p>
+<p>我们发现我们之前看到的jsp文件中的html内容，在这里被替换成了通过</p>
+<p>JspWriter对象一句一句的写出的。</p>
+<p>此时是不是理解了我之前说的，Jsp的本质就是servlet。表面上上我们是在一堆HTML标签中插入了一个又一个的java代码，本质上Tmocat在接收到客户端对我们这个jsp的请求后，会将我们的整个jsp文件编译成java文件在编译成.class文件。将HTML一句一句通过JspWriter对象的write方法一行一行的输出。</p>
+<h3 id="2-1-Velocity模板引擎简介"><a href="#2-1-Velocity模板引擎简介" class="headerlink" title="2.1 Velocity模板引擎简介"></a>2.1 Velocity模板引擎简介</h3><p>讲解了JSP的基础知识后不知道大家有没有发现一个问题就是，Jsp虽然说是模板引擎的一种，但是如果只做为一个为前端服务的模板引擎来说，它的功能过于强大了，导致它不光可以书写前端页面，因为JSP可以毫无阻碍地访问底层的 Servlet API 和 Java 编程语言，所以同时也可以无缝书写后端的逻辑代码，在展示数据的同时也可以对数据进行处理。</p>
+<p>这样就导致前端和后端完全就纠缠在了一起。完全违背了我们MVC的设计思想，你能想象一个前端页面是用Servlet输出，而后端代码使用Jsp来写的网站该怎么去维护么？</p>
+<p>面向对象的优雅思想在这一刻荡然无存。</p>
+<p>面向对象的核心思想就是，低耦合，高内聚。每一个模块的功能尽可能单一，尽可能的降低和别的模块和功能之间的耦合度。</p>
+<p>所以Thymeleaf，Velocity，Freemarker等优秀模板引擎就一个接一个的出现了。</p>
+<p>Velocity为主我们来了解，这个在MVC设计模式中，为View层服务的优秀模板引擎。</p>
+<p>刚才通过对Jsp的介绍，我们理解了，一个模板引擎他的主要功能就是负责将后端代码也就是servlet处理完成的数据，提取并按照之前写好的样式展示出来。</p>
+<p>Velocity是一个基于java的模板引擎（template engine）。它允许任何人仅仅使用简单的模板语言（template language）来引用由java代码定义的对象。 </p>
+<p>当Velocity应用于web开发时，<a href="http://baike.baidu.com/view/119481.htm" target="_blank" rel="noopener">界面设计</a>人员可以和java程序开发人员同步开发一个遵循MVC架构的web站点，也就是说，页面设计人员可以只关注页面的显示效果，而由java程序开发人员关注业务逻辑编码。Velocity将java代码从web页面中分离出来，这样为web站点的长期维护提供了便利，同时也为我们在JSP和PHP之外又提供了一种可选的方案。</p>
+<p>前面说了这么多，现在我们在这里简单演示下Velocity这个模板引擎，给大家一个更直观的概念。</p>
+<p>首先导入以下的包</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/14.png" alt="14"></p>
+<p>然后我们创建一个演示类</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/15.png" alt="15"></p>
+<p>这里我们首先实例话了一个VelocityEngine，并设置加载加载classpath目录下的vm文件</p>
+<p>然后初始化VelocityEngine，接着就是加载一个模板，这里模板的名字叫“Hellovelocity.vm” 接下来的操作就是我们向模板的上下文中添加我们要传递的参数和值了。</p>
+<p>最后的t.merget就会开始循环遍历生成的Velocity AST语法书的各个节点，执行每个节点的渲染方法。</p>
+<p>我们看一下我们加载的这个模板的具体实现</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/16.png" alt="16"></p>
+<p>和最终的执行结果</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/17.png" alt="17"></p>
+<p>我们看到这里可以将我们之前后端代码中传输的值直接取出也可以循环取出。</p>
+<p>这样我们就可以提前将静态部分用HTML和JavaScript写好，然后需要动态交互的部分就可以使用Velocity语法来进行编写。</p>
+<h2 id="3-漏洞和POC构造分析"><a href="#3-漏洞和POC构造分析" class="headerlink" title="3  漏洞和POC构造分析"></a>3  漏洞和POC构造分析</h2><h3 id="3-1-漏洞分析环境搭建"><a href="#3-1-漏洞分析环境搭建" class="headerlink" title="3.1 漏洞分析环境搭建"></a>3.1 漏洞分析环境搭建</h3><p>首先我们下载Apache Slor 8.2.0源码</p>
+<p><a href="https://mirrors.tuna.tsinghua.edu.cn/apache/lucene/solr/8.2.0/solr-8.2.0-src.tgz" target="_blank" rel="noopener">https://mirrors.tuna.tsinghua.edu.cn/apache/lucene/solr/8.2.0/solr-8.2.0-src.tgz</a></p>
+<p>下载完成后</p>
+<p>我们进入Solr源码根目录</p>
+<p>执行命令</p>
+<p>ant ivy-bootstrap</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/18.png" alt="18"></p>
+<p>然后再执行ant idea命令将源码转化成idea可以导入的模式</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/19.png" alt="19"></p>
+<p>然后我们打开idea，选择open</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/20.png" alt="20"></p>
+<p>最后导入完成后的样子</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/21.png" alt="21"></p>
+<p>为了可以调试源码，我们需要再做一些配置</p>
+<p>点开左上角的Edit Configuration</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/22.png" alt="22"></p>
+<p>然后新增Remote</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/23.png" alt="23"></p>
+<p>并按照如下配置</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/24.png" alt="24"></p>
+<p>配置完成后我们进入solr的服务端的bin目录，并执行如下命令</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/25.png" alt="25"></p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/26.png" alt="26"></p>
+<p>然后我们带idea中点击debug按钮，当有如下显示时代表调试环境搭建成功，</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/27.png" alt="27"></p>
+<p>接下来我们就可以在自己想下断点的地方下断点了。</p>
+<h3 id="3-2-POC第一部分执行和构造分析"><a href="#3-2-POC第一部分执行和构造分析" class="headerlink" title="3.2 POC第一部分执行和构造分析"></a>3.2 POC第一部分执行和构造分析</h3><p>首先我们就来一步一步分析这个漏洞吧，审计一个web项目我们首先先看有没有web.xml这个文件</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/28.png" alt="28"></p>
+<p>我们找到了web.xml这个文件，位置在solr/webapp/WEB-INF/目录下</p>
+<p>我们打开看一下内容</p>
+<p>首先这个web.xml文件一开始就是一个filter过滤器，这个过滤器类路径是</p>
+<p>org.apache.solr.servlet.SolrDispatchFilter，拦截的范围是所有请求</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/29.png" alt="29"></p>
+<p>所以我们首先就需要去这个SolrDispatchFilter这个类去观察</p>
+<p>此时我们有两条分析接下来漏洞走向的方式，我们通过查阅网上的资料得知</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/30.png" alt="30"></p>
+<p>我们去目录下查看一下</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/31.png" alt="31"></p>
+<p>果然有这两个文件</p>
+<p>然后我们看下两个文件的部分内容，先看下solrconfig.xml</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/32.png" alt="32"></p>
+<p>可以看到velocity.params.resource.loader.enabled参数默认是flase，也就是说是默认是不开启的。</p>
+<p>我们在看一看configoverlay.json文件</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/33.png" alt="33"></p>
+<p>看到这里存储着我们上传上来的参数，这里我们将params.resource.loader.enabled制为true</p>
+<p>我们可以通过观察该文件何时被修改来判断，是否该跟进代码中。</p>
+<p>然后我们观察poc的时候不难发现请求的API为“/config”</p>
+<p>我们通过查阅资料发现</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/34.png" alt="34"></p>
+<p>Solr中有很多的RequestHandler，默认配置在solrconfig.xml中，同时也有很多没有配置在solrconfig.xml，称为隐式RequestHandler。而“/config”就是其中之一，我们可以看到SolrConfigHandler便是处理提交我们提交poc的API之一</p>
+<p>但是为了，讲的更加清晰，我们还是从SolrDispatchFilter.doFilter方法来一步一步的跟踪。</p>
+<p>首先SolrDispatchFilter.doFilter方法执行到第 423行的时候，</p>
+<p>会调用HttpSolrCall.call方法</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/35.png" alt="35"></p>
+<p>我们跟进这个方法</p>
+<p>然后代码执行到execute()方法时configoverlay.json文件更新了 所以我们跟进这个函数</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/36.png" alt="36"></p>
+<p>继续跟进</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/37.png" alt="37"></p>
+<p>  按照上面的思路，执行到handler.handleRequest()继续跟进  </p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/38.png" alt="38"></p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/39.png" alt="39"></p>
+<p>此时就进入到了一开始我们从资料中所看到的“/config”所对应的类SolrConfigHandler，</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/40.png" alt="40"></p>
+<p>由于此时进入这个函数是为了调用它的handleRequestBody方法，所以我们接着向下执行</p>
+<p>这里POST用来修改数据。GET用来查询数据，所以我们执行到</p>
+<p>command.handlePOST()方法然后跟进</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/41.png" alt="41"></p>
+<p>执行到handleCommands()方法 此时传入的opsCopy就是我们从前端传入的配置信息，而overlay时当前的配置信息</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/42.png" alt="42"></p>
+<p>继续跟进，当执行到SolrResourceLoader.persistConfLocally()方法时</p>
+<p>configoverlay.json，文件更新了，</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/43.png" alt="43"></p>
+<p>此时我们看到，关键参数时overlay.toButeArray()</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/44.png" alt="44"></p>
+<p>而overlay参数最近的一次赋值动作是在这行代码里进行的，我们先跟进updateNamedPlugin()方法看一看</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/45.png" alt="45"></p>
+<p>updateNamedPlugin方法中将op 和overlay参数都传入了进去</p>
+<p>当执行到这个if判断时，判断为真，返回overlay，所以关键在于</p>
+<p>Verifyclass()这个函数。</p>
+<p>这里op仍然为我们 post传入的配置参数 clz的值为“solr.VelocityResponseWriter”</p>
+<p>继续跟进</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/46.png" alt="46"></p>
+<p>跟进函数之后我们看到这样一行代码</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/47.png" alt="47"></p>
+<p>根据执行逻辑首先执行getCore方法，返回一个SolrCore对象</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/48.png" alt="48"></p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/49.png" alt="49"></p>
+<p>然后执行op.getDataMap()方法，返回一个Map对像</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/50.png" alt="50"></p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/51.png" alt="51"></p>
+<p>然后new 一个PluginInfo对象，构造方法里的主要操作就是向一个 NameList类型的对象中存值，存入的是我们POST传入的配置参数。</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/52.png" alt="52"></p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/53.png" alt="53"></p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/54.png" alt="54"></p>
+<p>createInitInstance()方法</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/55.png" alt="55"></p>
+<p>泛型变量o是根据我们传入的参数PulginInfo对象的className属性“solr.VelocityResponseWriter”然后通过createInstance()方法反射获得的VelocityResponseWriter对象</p>
+<p>因为VelocityResponseWriter对象实现了NamedListInitializedPlugin接口</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/56.png" alt="56"></p>
+<p>所以执行</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/57.png" alt="57"></p>
+<p>跟进</p>
+<p>然后我们进入了VelocityResponseWriter对象的init方法，在这里有这么几行代码</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/58.png" alt="58"></p>
+<p>可以看到在这里我们将VelocityResponseWriter对像的两个重要属性</p>
+<p>paramsResourceLoaderEnabled，</p>
+<p>solrResourceLoaderEnabled</p>
+<p>设置为了true，也就是允许我们上传自定义模板了</p>
+<p>紧接着init方法执行结束后，就会将VelocityResponseWriter对象按原路返回到SolrConfigHandler并赋值给overly属性</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/59.png" alt="59"></p>
+<p>紧接着执行到第504行代码时configoverlay.json文件更新了，我们跟进这个方法</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/60.png" alt="60"></p>
+<p>在调用SolrResourceLoader.persistConfLocally()方法时，可以看到我们将</p>
+<p>overly作为参数传递了进去</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/61.png" alt="61"></p>
+<p>此时观察代码我们就明白了，真正将我们post传递的配置参数写入文件的操作是在这一步进行的。至此 poc的第一部分追踪完毕。</p>
+<h3 id="3-3-POC第二部分执行和构造分析"><a href="#3-3-POC第二部分执行和构造分析" class="headerlink" title="3.3  POC第二部分执行和构造分析"></a>3.3  POC第二部分执行和构造分析</h3><p>接下来是poc执行的第二阶段</p>
+<p>老规矩先从SolrDispatchFilter类看起</p>
+<p>执行到HttpSolrCall.call步入</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/62.png" alt="62"></p>
+<p>紧接着执行到HttpSolrCall.writeResponse方法</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/63.png" alt="63"></p>
+<p>观察此刻传入的三个参数，solrRsp参数是一个 SolrQueryResponse对象，我们GET传入的playload存储在该对象的value属性中</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/64.png" alt="64"></p>
+<p>这个responseWriter对象相当重要，这里我们看到了两个参数</p>
+<p>paramsResourceLoaderEnabled和solrResourceLoaderEnabled</p>
+<p>这是我们poc第一步中修改的两个配置属性，只有这两个属性为true我们才可以上传自定义模板成功</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/65.png" alt="65"></p>
+<p>responseWriter参数指向的是一个VelocityResponseWriter对象，responseWriter最近一次被赋值是在，下面这行代码中</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/66.png" alt="66"></p>
+<p>本着刨根问底，以及锻炼我们分析代码执行逻辑能力的目的，我们深入了解一下</p>
+<p>我们跟踪进HttpSolrCall.getResponseWriter方法</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/67.png" alt="67"></p>
+<p>可以看到，这里将我们GET穿入的key的值为wt的属性里面的值velocity取出并作为参数传给了core.getQueryResponseWriter方法，core参数指向的是一个SolrCore对象</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/68.png" alt="68"></p>
+<p>跟入SolrCore.getQueryResponseWriter方法，</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/69.png" alt="69"></p>
+<p>跟入responseWriters.get方法，</p>
+<p>此时我们来到了一个PluginBag对象的get方法 </p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/70.png" alt="70"></p>
+<p>在执行完T result = get(name)方法后 result的结果中是一个VelocityResponseWriter对象且</p>
+<p>paramsResourceLoaderEnabled和solrResourceLoaderEnabled属性都已被置为true，就是说给这两个属性赋值的操作就在get(name)这个方法里。继续跟进</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/71.png" alt="71"></p>
+<p>还是继续跟进result的无参get方法</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/72.png" alt="72"></p>
+<p>到这里，就出现问题了</p>
+<p>这里会判断一个名字叫lazyInst的属性是否为空，如果不为空，则返回这个属性。</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/73.png" alt="73"></p>
+<p>我们来看看此时这个lazyInst属性是什么，</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/74.png" alt="74"></p>
+<p>可以看到就是我们最终返回的VelocityResponseWriter对象。</p>
+<p>那么问题就来了，我们这执行过程中并没有看到lazyInst对象被赋值，那么lazyInst属性指向的VelocityResponseWriter对象是哪来的呢？</p>
+<p>我们会退一步，观察这行代码</p>
+<p>PluginHolder<t> result = registry.get(name);</t></p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/75.png" alt="75"></p>
+<p>registry是一个hashmap类型，有final标识符</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/76.png" alt="76"></p>
+<p>观察此时registry里面的内容</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/77.png" alt="77"></p>
+<p>又因为registry.get(name)传入的name参数的值为velocity</p>
+<p>我们打开这里的velocity</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/78.png" alt="78"></p>
+<p>赫然看到那个lazyInst就在里面，我们知道标示的final的属性就是常量了，在对像生成被赋值了一次以后就不会再更改了。我通过多次发送poc请求测试发现每次到这个断点时当前的对象ID都是相同的，所以每次执行调用的都是同一个对像。</p>
+<p>我们重新发送poc的第一部分。Poc第一部分请求完成后再在此处下断点</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/79.png" alt="79"></p>
+<p>此时lazyInst属性就为空了</p>
+<p>我们继续执行</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/80.png" alt="80"></p>
+<p>此时由于lazyInst为空了，所以不会直接返回，我们跟进createInst方法，</p>
+<p>看到在createInst方法的最后lazyInst属性被赋值，我们向上寻找这个localInst变量</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/81.png" alt="81"></p>
+<p>在下面这行代码中localInst第一次被赋值</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/82.png" alt="82"></p>
+<p>此时localInst中的内容为</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/83.png" alt="83"></p>
+<p>也就是说此时程序只是从solrconfig.xml中读取了默认的配置，还并没有读取</p>
+<p>configoverlay.json中我们更新的配置。</p>
+<p>所以这行就不跟进了。</p>
+<p>当执行到initInstance(localInst, pluginInfo)这行代码时</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/84.png" alt="84"></p>
+<p>我们清楚的看到参数被更新了，那我们就跟入这行代码</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/85.png" alt="85"></p>
+<p>跟入((NamedListInitializedPlugin) inst).init(info.initArgs)</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/86.png" alt="86"></p>
+<p>然后就又看到了我们执行poc第一部分时所碰到的代码了，至此获取</p>
+<p>configoverlay.json中我们更新的配置信息的执行逻辑我们已经分析完毕</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/87.png" alt="87"></p>
+<p>接下来继续原路返回到我们调用HttpSolrCall.getResponseWriter的位置</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/88.png" alt="88"></p>
+<p>继续跟进writeResponse(solrRsp, responseWriter, reqMethod);</p>
+<p>此时solrRsp中存放的是我们Get传入的poc，responseWriter中存放的是我们configoverlay.json文件中存放的更新配置。</p>
+<p>跟入QueryResponseWriterUtil.writeQueryResponse方法。</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/89.png" alt="89"></p>
+<p>跟入responseWriter.write方法</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/90.png" alt="90"></p>
+<p>我们执行createEngine()方法时生成了一个VelocityEngine对象</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/91.png" alt="91"></p>
+<p>我们进入createEngine()方法后可以看到方法内的第一行代码就是new一个VelocityEngine对象</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/92.png" alt="92"></p>
+<p>关键点在以下这几行代码，这里对</p>
+<p>paramsResourceLoaderEnabled</p>
+<p>solrResourceLoaderEnabled两个参数进行了判断，当</p>
+<p>paramsResourceLoaderEnabled参数为true时执行</p>
+<p>loaders.add(“params”);</p>
+<p>engine.setProperty(“params.resource.loader.instance”, new SolrParamResourceLoader(request));</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/93.png" alt="93"></p>
+<p>根据网上查到的资料我们可以看到params.resource.loader.instance这个属性的含义</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/94.png" alt="94"></p>
+<p>也就是说当开启这个属性的时候，我们就可以通过Solr来上传我们自定义的模板了。</p>
+<p>最后返回VelocityEngine对象</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/95.png" alt="95"></p>
+<p>返回到responseWriter.write方法，继续执行到</p>
+<p>Template template = getTemplate(engine, request);</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/96.png" alt="96"></p>
+<p>这里我们生成了一个template</p>
+<p>跟进去后我们看到</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/97.png" alt="97"></p>
+<p>从我们Get传入的参数中获取V.template作为模板的名字</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/98.png" alt="98"></p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/99.png" alt="99"></p>
+<p>同时将我们传入的Poc也就时Velocity模板语句解析成AST抽象语法树</p>
+<p>这里就要对velocity的AST抽象语法树做一下简单的介绍了</p>
+<p>在计算机科学中，抽象语法树（abstract syntax tree 或者缩写为 AST），或者语法树（syntax tree），是源代码的抽象语法结构的树状表现形式，这里特指编程语言的源代码。树上的每个节点都表示源代码中的一种结构。</p>
+<p>之所以说语法是「抽象」的，是因为这里的语法并不会表示出真实语法中出现的每个细节。</p>
+<p>Velocity是通过JavaCC和JJTree生成抽象语法树的,</p>
+<p>javaCC 是一个能生成语法和词法分析器的生成程序。语法和词法分析器是字符串处理软件的重要组件，<a href="http://www.google.com/url?sa=t&amp;ct=res&amp;cd=1&amp;url=https%3A%2F%2Fjavacc.dev.java.net%2F&amp;ei=9DVYRYiNNqOEpgKyrbivCQ&amp;usg=__mFYMOj71sh29a1K1V8lPTOwCBok=&amp;sig2=hEpGu_jpqYUmHxmOExyoMg" target="_blank" rel="noopener">javacc</a>是类似lex/yacc的parser生成器，可以把一段文本转换为抽象语法树（AST）。</p>
+<p>JJTree是javaCC的预处理器，用于在JavaCC生成的源代码中的各个地方插入表示语义动作的分析树</p>
+<p>用网上的一张图来介绍一下AST的一些节点</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/100.png" alt="100"></p>
+<p>Velocity的语法相对简单，所以它的语法节点并不是很多，总共有50几个，它们可以划分为如下几种类型。</p>
+<ol>
+<li><p>块节点类型：主要用来表示一个代码块，它们本身并不表示某个具体的语法节点，也不会有什么渲染规则。这种类型的节点主要由ASTReference、ASTBlock和ASTExpression等组成。</p>
+</li>
+<li><p>扩展节点类型：这些节点可以被扩展，可以自己去实现，如我们上面提到的#foreach，它就是一个扩展类型的ASTDirective节点，我们同样可以自己再扩展一个ASTDirective类型的节点。</p>
+</li>
+<li><p>中间节点类型：位于树的中间，它的下面有子节点，它的渲染依赖于子节点才能完成，如ASTIfStatement和ASTSetDirective等。</p>
+</li>
+<li><p>叶子节点：它位于树的叶子上，没有子节点，这种类型的节点要么直接输出值，要么写到writer中，如ASTText和ASTTrue等。 </p>
+</li>
+</ol>
+<p>我们再来看一下poc中的Velocity语句，和children中的节点信息</p>
+<p>#set($x=’’) </p>
+<p>#set($rt=$x.class.forName(‘java.lang.Runtime’)) </p>
+<p>#set($ex=$rt.getRuntime().exec(‘open /Applications/Calculator.app/‘))</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/101.png" alt="101"></p>
+<p>#set最终被解析为Velocity AST语法树中的ASTSetDirective类，根据上面的Velocity AST语法树的图我们看到ASTSetDirective节点有两个字节点</p>
+<p>分别是ASTReference,和ASTExpression,</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/102.png" alt="102"></p>
+<p>我们看到下标为0的ASTSetDirective类中有两个属性。right和left</p>
+<p>分别代表了$x=’’中“=”号的两边，左边的ASTReference有两种可能，</p>
+<p>一就是用来进行赋值操作的变量名</p>
+<p>例：#set( $iAmVariable = ‘good!’)将字面量“good”赋值给名字为iAmVariable的变量</p>
+<p>第二种也是赋值操作，但是赋值操作的目标是一个对象的某个属性</p>
+<p>例：#set($Persion.name = ‘kkk’)</p>
+<p>这种赋值方式的本质其实是调用Persion的setName方法。</p>
+<p>区分这两种赋值方式我们可以动过观察此时的ASTReference这个节点是否有子节点来判断</p>
+<p>譬如第一种#set( $iAmVariable = ‘good!’) 我们观察一下</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/103.png" alt="103"></p>
+<p>可以看到最后的children属性为空</p>
+<p>再观察第二种#set($Persion.name = ‘kkk’)</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/104.png" alt="104"></p>
+<p>可以看到children属性中，是有子节点的。</p>
+<p>Velocity通过ASTReference类来表示一个变量和变量的方法调用，ASTReference类如果有子节点，就表示这个变量有方法调用，方法调用同样是通过“.”来区分的，每一个点后面会对应一个方法调用。ASTReference有两种类型的子节点，分别是ASTIdentifier和ASTMethod。它们分别代表两种类型的方法调用，其中ASTIdentifier主要表示隐式的“get”和“set”类型的方法调用。而ASTMethod表示所有其他类型的方法调用，如所有带括号的方法调用都会被解析成ASTMethod类型的节点。</p>
+<p>所谓隐式方法调用在Velocity中通常有如下几种。</p>
+<p>1.Set类型，如#set($person.name=”junshan”)，如下：</p>
+<p>·    person.setName(“junshan”)</p>
+<p>·    person.setname(“junshan”)</p>
+<p>·    person.put(“name”,”junshan”)</p>
+<p>2.Get类型，如#set($name=$person.name)中的$person.name，如下：</p>
+<p>·    person.getName()</p>
+<p>·    person.getname()</p>
+<p>·    person.get(“name”)</p>
+<p>·    person.isname()</p>
+<p>·    person.isName()</p>
+<p>接下来我们来看ASTText节点，我们从节点图中看到ASTText没有任何子节点了，它是一个叶子结点，所以这种类型的节点要么直接输出值，要么写到writer中。</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/105.png" alt="105"></p>
+<p>到这里我们简单介绍了下Velocity AST语法树的一些基础知识。接下来我们回归我们程序的执行逻辑。</p>
+<p>接下来的velocity模板引擎的执行逻辑现在这里简单说明一下，其实也很简单，其实就是会不停的遍历和执行各个子节点中的render方法</p>
+<p>首先根据Velocity AST语法树的那张图，我们看到总的根节点是ASTprocess</p>
+<p>所以会首先调用ASTprocess的render方法，具体在哪里调用呢，我们来看代码</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/106.png" alt="106"></p>
+<p>继续跟入</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/107.png" alt="107"></p>
+<p>当执行到((SimpleNode)data).render(ica,writer);</p>
+<p>这行代码是，我们可以看到此时的data就是ASTprocess节点，所以Template.merge方法中调用了AST的根节点(ASTprocess)的render方法((SimpleNode)data).render(ica,writer);。此调用将迭代处理各个子节点render方法。如果是ASTReference类型的节点则在render方法中会调用execute方法执行反射替换相关处理。</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/108.png" alt="108"></p>
+<p>当进入到ASTprocess节点的render方法后会根据深度优先遍历算法开始遍历整棵树，遍历算法如下</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/109.png" alt="109"></p>
+<p>即依次执行当前节点中的所有子节点的render方法，而每个节点的具体渲染规则都在其对应节点的render方法中实现。</p>
+<p>这里我们可以打印一下我们poc所生成的语法树的详细结构</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/110.png" alt="110"></p>
+<p>有了这个语法树结构后，程序的执行顺序就相当清晰了。</p>
+<p>我们首先调用了ASTSetDirective类的render方法，看到该方法中首先调用了ASTExpression类value方法。</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/111.png" alt="111"></p>
+<p>而ASTExpression类value方法中又调用了它的子节点ASTStringLiteral</p>
+<p>节点的value方法</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/112.png" alt="112"></p>
+<p>最后ASTStringLiteral类的value方法返回一个字面量 </p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/113.png" alt="113"></p>
+<p>接着返回到ASTSetDirective类执行它的第二个子节点也就是等号左边的$x</p>
+<p>这里对应的是ASTReference类，这里是调用了ASTReference类的setValue方法</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/114.png" alt="114"></p>
+<p>跟入方法后可以看到，由于该ASTReference节点没有子节点了，所以</p>
+<p>直接执行</p>
+<p>context.put(rootString, value);这里的value就是我们刚刚获得的“=”号右边的字面量</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/115.png" alt="115"></p>
+<p>我们跟进去看一眼，能看得出后续就是赋值操作了，就不继续深入了</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/116.png" alt="116"></p>
+<p>Poc第一行#set($x=’’)执行完毕</p>
+<p>然后开始遍历第二个节点</p>
+<p>第二个节点是ASTText节点，这个没什么好说的，就只是直接输出或着写到write中</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/117.png" alt="117"></p>
+<p>然后开始遍历第三个节点</p>
+<p>第三个节点仍然是ASTSetDirective类，它的render方法中仍然是先执行“=”号右边的子节点ASTExpression类的value方法</p>
+<p>当执行到该方法时我们可以看到，此时的ASTExpression节点还有一个子节点，但是不是ASTStringLiteral节点了，而是ASTReference节点</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/118.png" alt="118"></p>
+<p>所以此次执行的将会是ASTReference类的value方法</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/119.png" alt="119"></p>
+<p>执行execute方法</p>
+<p>我们重点看execute中的这行代码</p>
+<p>Object result = getVariableValue(context, rootString);</p>
+<p>这里返回的是我们给$x所赋的值“”然后程序会判断该值是否为空</p>
+<p>如果一开始我们没有执行#set($x=’’)为$x赋一个值的话，此时会执行下面的</p>
+<p>EventHandlerUtil.invalidGetMethod()方法，该方法会因为$x的值为空而不会向下继续执行。</p>
+<p>所以我们poc的第一步就需要先为一个变量赋值，赋任何值都可以。</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/120.png" alt="120"></p>
+<p>接下来执行到下面这些代码时，就开始遍历当前ASTReference的两个子节点</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/121.png" alt="121"></p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/122.png" alt="122"></p>
+<p>执行完ASTIdentifier类的execute返回一个Class对象</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/123.png" alt="123"></p>
+<p>接下来就是遍历第二个节点也就是ASTMethod节点，</p>
+<p>执行ASTMethod节点的execute方法。 </p>
+<p>Execute方法中执行了method的invoke方法跟入</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/124.png" alt="124"></p>
+<p>最调用doInvoke方法</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/125.png" alt="125"></p>
+<p>我们看一下doInvoke方法的内容</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/126.png" alt="126"></p>
+<p>这一路下来的反射调用到最终获取Runtime类的class对象我用更直观的方式重写了一下方便理解</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/127.png" alt="127"></p>
+<p>这一系列的操作等同于Class.forName(“java.lang.Runtime”)</p>
+<p>后面的poc的第三行</p>
+<p>#set($ex=$rt.getRuntime().exec(‘open /Applications/Calculator.app/‘))</p>
+<p>执行逻辑和上面的如出一辙，就不再深入分析了，感兴趣的朋友可以自己跟踪代码分析一下。</p>
+<p>最后放一下最终的一个调用链</p>
+<p><img src="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/128.png" alt="128"></p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <i class="fas fa-exclamation-circle"></i>
+            在法律允许的范围内，
+            <a href="http://LinShiG0ng.github.io">
+                有关部门临时工
+            </a>
+            在天融信阿尔法实验室工作期间创作
+            <a  href="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/">
+                《Apache Solr Velocity模板注入漏洞深度分析》
+            </a>
+            。此作品发布在：
+            <span property="vcard:Country" datatype="dct:ISO3166"
+                content="CN" about="/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/">
+                天融信阿尔法实验室官方公众号及其各大论坛官方账号
+            </span>
+            </p>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/Java/">
+                                    <span class="chip bg-color">Java</span>
+                                </a>
+                            
+                                <a href="/tags/Web%E5%AE%89%E5%85%A8/">
+                                    <span class="chip bg-color">Web安全</span>
+                                </a>
+                            
+                                <a href="/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/">
+                                    <span class="chip bg-color">代码审计</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/">
+                    <div class="card-image">
+                        
+                        <img src="https://cdn.educba.com/academy/wp-content/uploads/2018/08/Spring-Framework-Interview-Questions.jpg" class="responsive-img" alt="Java框架级SSM代码审计思路">
+                        
+                        <span class="card-title">Java框架级SSM代码审计思路</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            SSM框架，即SpringMVC+Spring+Mybatis三个开源框架整合在一起的缩写。
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2020-05-31
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            有关部门临时工
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/Java/">
+                        <span class="chip bg-color">Java</span>
+                    </a>
+                    
+                    <a href="/tags/Web%E5%AE%89%E5%85%A8/">
+                        <span class="chip bg-color">Web安全</span>
+                    </a>
+                    
+                    <a href="/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/">
+                        <span class="chip bg-color">代码审计</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2020/05/30/hello-world/">
+                    <div class="card-image">
+                        
+                        
+                        <img src="/medias/featureimages/12.jpg" class="responsive-img" alt="Hello World">
+                        
+                        <span class="card-title">Hello World</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hex
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2020-05-30
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            有关部门临时工
+                            
+                        </span>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+<!-- 代码块折行 -->
+
+<style type="text/css">
+code[class*="language-"], pre[class*="language-"] { white-space: pre !important; }
+</style>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="tencent"
+                   type="search"
+                   id="岁月神偷"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='none'
+                   order='list'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            <span id="year">2019</span>
+            <a href="http://LinShiG0ng.github.io" target="_blank">有关部门临时工</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                class="white-color">19.1k</span>&nbsp;字
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/linshig0ng" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:450956259@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=450956259" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 450956259" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc("/search.xml", 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <script type="text/javascript" src="/libs/background/ribbon-dynamic.js" async="async"></script>
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>
