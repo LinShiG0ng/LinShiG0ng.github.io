@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://linshig0ng.github.io/"/>
-  <updated>2020-05-31T16:35:39.423Z</updated>
+  <updated>2020-07-06T01:59:17.679Z</updated>
   <id>http://linshig0ng.github.io/</id>
   
   <author>
@@ -15,6 +15,37 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Apache dubbo (CVE-2020-1948) 反序列化远程代码执行漏洞及其补丁绕过深度分析</title>
+    <link href="http://linshig0ng.github.io/2020/07/03/apache-dubbo-cve-2020-1948-fan-xu-lie-hua-yuan-cheng-dai-ma-zhi-xing-lou-dong-ji-qi-bu-ding-rao-guo-shen-du-fen-xi/"/>
+    <id>http://linshig0ng.github.io/2020/07/03/apache-dubbo-cve-2020-1948-fan-xu-lie-hua-yuan-cheng-dai-ma-zhi-xing-lou-dong-ji-qi-bu-ding-rao-guo-shen-du-fen-xi/</id>
+    <published>2020-07-03T14:44:01.000Z</published>
+    <updated>2020-07-06T01:59:17.679Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h1 id=&quot;Apache-dubbo-CVE-2020-1948-反序列化远程代码执行漏洞及其补丁绕过深度分析&quot;&gt;&lt;a href=&quot;#Apache-dubbo-CVE-2020-1948-反序列化远程代码执行漏洞及其补丁绕过深度分析&quot; class=&quot;headerlink&quot;
+        
+      
+    
+    </summary>
+    
+    
+    
+      <category term="CVE" scheme="http://LinShiG0ng.github.io/tags/CVE/"/>
+    
+      <category term="Web安全" scheme="http://LinShiG0ng.github.io/tags/Web%E5%AE%89%E5%85%A8/"/>
+    
+      <category term="代码审计" scheme="http://LinShiG0ng.github.io/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/"/>
+    
+      <category term="Apache Dubbo" scheme="http://LinShiG0ng.github.io/tags/Apache-Dubbo/"/>
+    
+  </entry>
   
   <entry>
     <title>Java反序列化系列ysoserialJdk7u21</title>
