@@ -474,7 +474,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-06-01
+                    2020-07-06
                 </div>
                 
 
@@ -609,47 +609,48 @@ plaintext = plaintext + ('\0' * add) #填充</code></pre><p>通过下图可以�
 <p>再根据上一个式子可以得到，Y = “q” xor “a” xor “ b”</p>
 <p>已知X是未经修改的IV与明文异或的结果也就是所谓的中间值，也就说解密时X时作为解密时的中间值同样要参与到解密时的异或步骤，但是如果我们在传递数据时将“q”更改为我们的Y。让Y去和X进行异或操作，最终得到的结果就变成了”b“ ，这样我们就实现了更改明文的第一个字节，接下来的同样是进行重复操作。</p>
 <p>这就是所谓的CBC字节翻转攻击的原理，下面贴出实现代码。</p>
-<pre><code>from pyDes import des, CBC, PAD_PKCS5
-import binascii
+<pre class=" language-python"><code class="language-python"><span class="token keyword">from</span> pyDes <span class="token keyword">import</span> des<span class="token punctuation">,</span> CBC<span class="token punctuation">,</span> PAD_PKCS5
+<span class="token keyword">import</span> binascii
 
-# 秘钥
-KEY = 'mHAxsLYz'
-#初始化向量
-KEY2 = "qwerasdf"
+<span class="token comment" spellcheck="true"># 秘钥</span>
+KEY <span class="token operator">=</span> <span class="token string">'mHAxsLYz'</span>
+<span class="token comment" spellcheck="true">#初始化向量</span>
+KEY2 <span class="token operator">=</span> <span class="token string">"qwerasdf"</span>
 
-def des_encrypt(s):
-    """
+<span class="token keyword">def</span> <span class="token function">des_encrypt</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""
     DES 加密
     :param s: 原始字符串
     :return: 加密后字符串，16进制
-    """
-    secret_key = KEY
-    iv = KEY2
-    k = des(secret_key, CBC, iv, pad=None, padmode=PAD_PKCS5)
-    en = k.encrypt(s, padmode=PAD_PKCS5)
-    return binascii.b2a_hex(en)
+    """</span>
+    secret_key <span class="token operator">=</span> KEY
+    iv <span class="token operator">=</span> KEY2
+    k <span class="token operator">=</span> des<span class="token punctuation">(</span>secret_key<span class="token punctuation">,</span> CBC<span class="token punctuation">,</span> iv<span class="token punctuation">,</span> pad<span class="token operator">=</span>None<span class="token punctuation">,</span> padmode<span class="token operator">=</span>PAD_PKCS5<span class="token punctuation">)</span>
+    en <span class="token operator">=</span> k<span class="token punctuation">.</span>encrypt<span class="token punctuation">(</span>s<span class="token punctuation">,</span> padmode<span class="token operator">=</span>PAD_PKCS5<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> binascii<span class="token punctuation">.</span>b2a_hex<span class="token punctuation">(</span>en<span class="token punctuation">)</span>
 
 
-def des_descrypt(s,iv):
-    """
+<span class="token keyword">def</span> <span class="token function">des_descrypt</span><span class="token punctuation">(</span>s<span class="token punctuation">,</span>iv<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token triple-quoted-string string">"""
     DES 解密
     :param s: 加密后的字符串，16进制
     :return:  解密后的字符串
-    """
-    secret_key = KEY
-    iv = iv
-    k = des(secret_key, CBC, iv, pad=None, padmode=PAD_PKCS5)
-    de = k.decrypt(binascii.a2b_hex(s), padmode=PAD_PKCS5)
-    return de
+    """</span>
+    secret_key <span class="token operator">=</span> KEY
+    iv <span class="token operator">=</span> iv
+    k <span class="token operator">=</span> des<span class="token punctuation">(</span>secret_key<span class="token punctuation">,</span> CBC<span class="token punctuation">,</span> iv<span class="token punctuation">,</span> pad<span class="token operator">=</span>None<span class="token punctuation">,</span> padmode<span class="token operator">=</span>PAD_PKCS5<span class="token punctuation">)</span>
+    de <span class="token operator">=</span> k<span class="token punctuation">.</span>decrypt<span class="token punctuation">(</span>binascii<span class="token punctuation">.</span>a2b_hex<span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">,</span> padmode<span class="token operator">=</span>PAD_PKCS5<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> de
 
-str = des_encrypt("admin")
-cipher = bytes(KEY2,encoding='utf-8')
-print(cipher)
-x = bytes([ord(chr(cipher[0]))^ord('a')^ord('b')])+cipher[1:]
-x2 = cipher[0]
-print(x)
-str3 = des_descrypt(str,x)
-print(str3)</code></pre><p>下面是执行结果</p>
+str <span class="token operator">=</span> des_encrypt<span class="token punctuation">(</span><span class="token string">"admin"</span><span class="token punctuation">)</span>
+cipher <span class="token operator">=</span> bytes<span class="token punctuation">(</span>KEY2<span class="token punctuation">,</span>encoding<span class="token operator">=</span><span class="token string">'utf-8'</span><span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>cipher<span class="token punctuation">)</span>
+x <span class="token operator">=</span> bytes<span class="token punctuation">(</span><span class="token punctuation">[</span>ord<span class="token punctuation">(</span>chr<span class="token punctuation">(</span>cipher<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">^</span>ord<span class="token punctuation">(</span><span class="token string">'a'</span><span class="token punctuation">)</span><span class="token operator">^</span>ord<span class="token punctuation">(</span><span class="token string">'b'</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token operator">+</span>cipher<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">:</span><span class="token punctuation">]</span>
+x2 <span class="token operator">=</span> cipher<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+str3 <span class="token operator">=</span> des_descrypt<span class="token punctuation">(</span>str<span class="token punctuation">,</span>x<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span>str3<span class="token punctuation">)</span></code></pre>
+<p>下面是执行结果</p>
 <p><img src="/2020/05/31/paddingoracle-yuan-li-shen-du-jie-xi/10.png" alt="10"></p>
 <script>
         document.querySelectorAll('.github-emoji')
@@ -1193,7 +1194,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">44.3k</span>&nbsp;字
+                class="white-color">43.9k</span>&nbsp;字
             
             
             
