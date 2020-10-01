@@ -474,21 +474,21 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-09-29
+                    2020-10-01
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-file-word fa-fw"></i>文章字数:&nbsp;&nbsp;
-                    13.8k
+                    13.4k
                 </div>
                 
 
                 
                 <div class="info-break-policy">
                     <i class="far fa-clock fa-fw"></i>阅读时长:&nbsp;&nbsp;
-                    58 分
+                    56 分
                 </div>
                 
 
@@ -511,7 +511,7 @@
 <p>在客户端(远程方法调用者)和服务端(远程方法提供者)之间又多了一个丙方也就所谓的Registry也就是注册中心。</p>
 <p>启动这个注册中心的代码非常简单，如下所示</p>
 <p>这个Registry是一个单独的程序 路径位于/Library/Java/JavaVirtualMachines/jdk1.8.0_221.jdk/Contents/Home/bin/rmiregistry</p>
-<p>![image-20200721104006909](个人学习过程中对RMI JRMP 以及JNDI的一些理解/2.png)</p>
+<p><img src="/2020/09/23/ge-ren-xue-xi-guo-cheng-zhong-dui-rmi-jrmp-yi-ji-jndi-de-yi-xie-li-jie/2.png" alt="2"></p>
 <p>刚刚所示的启动RMIRegistry的代码，也就是调用了这个rmiregistry可执行程序而已。</p>
 <p>简单follow一下代码</p>
 <pre class=" language-java"><code class="language-java"> <span class="token keyword">public</span> <span class="token keyword">static</span> Registry <span class="token function">createRegistry</span><span class="token punctuation">(</span><span class="token keyword">int</span> port<span class="token punctuation">)</span> <span class="token keyword">throws</span> RemoteException <span class="token punctuation">{</span>
@@ -575,7 +575,7 @@
     <span class="token punctuation">}</span>
 <span class="token punctuation">}</span></code></pre>
 <p>这个白名单先暂且放一放，后面用到了再说。执行完<code>new UnicastServerRef(var2, RegistryImpl::registryFilter)</code>后简单看一下UnicastServerRef对象里的内容</p>
-<p>![image-20200720224807624](个人学习过程中对RMI JRMP 以及JNDI的一些理解/1.png)</p>
+<p><img src="/2020/09/23/ge-ren-xue-xi-guo-cheng-zhong-dui-rmi-jrmp-yi-ji-jndi-de-yi-xie-li-jie/1.png" alt="1"></p>
 <p>setup方法内容</p>
 <pre class=" language-java"><code class="language-java"> <span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">setup</span><span class="token punctuation">(</span>UnicastServerRef var1<span class="token punctuation">)</span> <span class="token keyword">throws</span> RemoteException <span class="token punctuation">{</span>
         <span class="token keyword">this</span><span class="token punctuation">.</span>ref <span class="token operator">=</span> var1<span class="token punctuation">;</span>
@@ -609,7 +609,7 @@
 <span class="token punctuation">}</span></code></pre>
 <p>很好这样启动rmiregistry的过程就简单分析完毕了，但是此时有一个问题，就是为什么会需要rmiregistry这么一个注册机制？客户端和服务端之间直接通过Socket互相调用不就好了么？就像马士兵老师的代码那样。很明显那个只是简单的讲解原理的用例，实际生产环境中肯定不会这么简单。</p>
 <p>首先看下面这个RMI简单的流程图</p>
-<p>![image-20200721105724075](个人学习过程中对RMI JRMP 以及JNDI的一些理解/3.png)</p>
+<p><img src="/2020/09/23/ge-ren-xue-xi-guo-cheng-zhong-dui-rmi-jrmp-yi-ji-jndi-de-yi-xie-li-jie/3.png" alt="3"></p>
 <p>在考虑为什么需要这个rmiregistry之前，先考虑一个比较尴尬的问题。就是客户端(远程方法调用方)要想调用服务端(远程放方法服务方)的话，客户端要怎样才能知道服务端用来提供远程方法调用服务的ip地址和端口号？你说直接事先商量好然后写死在代码里面？可是服务方提供的端口号都是随机的啊，总不能我服务端每增加一个新的远程方法提供类就手动指定一个新的端口号吧？</p>
 <p>所以现在就很尴尬，陷入了一个死循环，客户端想要调用服务端的方法客户端就需要先知道服务端的地址和对应的端口号，但是客户端又不知道因为没人告诉他。。。所以就相当的蛋疼。</p>
 <p>此时就有了rmiregistry这么一个东西，我们先把rmiregistry称为丙方，功能很简单，服务端每新提供一个远程方法，都会来丙方(rmiregistry)这里注册一下，写明提供该方法远程条用服务的ip地址以及所对应的端口以及别的一些信息。</p>
@@ -713,12 +713,12 @@
 <span class="token comment" spellcheck="true">//第二个参数是同样的UnicastRef里面又包含了一个同样的LiveRef，以及最后同样的false</span>
 <span class="token keyword">return</span> <span class="token punctuation">(</span>Registry<span class="token punctuation">)</span> Util<span class="token punctuation">.</span><span class="token function">createProxy</span><span class="token punctuation">(</span>RegistryImpl<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span> ref<span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
 <p>所以说从源码上分析 <code>LocateRegistry.getRegistry()</code>和<code>LocateRegistry.createRegistry()</code>最后的返回结果应该是一样的，我们看一下结果</p>
-<p>![image-20200721223449017](个人学习过程中对RMI JRMP 以及JNDI的一些理解/4.png)</p>
+<p><img src="/2020/09/23/ge-ren-xue-xi-guo-cheng-zhong-dui-rmi-jrmp-yi-ji-jndi-de-yi-xie-li-jie/4.png" alt="4"></p>
 <p>果然不出所料返回的同样都是RegistryImpl_Stub对象，只不过<code>LocateRegistry.getRegistry()</code>执行完不会在本地再开一个监听端口罢了。</p>
 <p>好了 现在我们有了一个RegistryImpl_Stub对象，我们要用它来将我们的HelloImpl注册到rmiregistry中，用到的是<code>RegistryImpl_Stub.bind()</code>方法。</p>
 <p>ok，hold on 我们先来了解一下这个<code>RegistryImpl_Stub</code>首先该类是继承了RemoteStub，并实现了Registry, Remote接口(我们的HelloImpl也实现了这个接口)，</p>
 <p>该类的方法不多，就下面截图里这么些。没必要全都看，先看bind就行。</p>
-<p>![image-20200721225231264](个人学习过程中对RMI JRMP 以及JNDI的一些理解/5.png)</p>
+<p><img src="/2020/09/23/ge-ren-xue-xi-guo-cheng-zhong-dui-rmi-jrmp-yi-ji-jndi-de-yi-xie-li-jie/5.png" alt="5"></p>
 <p>bind方法详细代码如下</p>
 <pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">//var1为字符串“hello”，var2就是咱们的HelloImpl对象</span>
 <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">bind</span><span class="token punctuation">(</span>String var1<span class="token punctuation">,</span> Remote var2<span class="token punctuation">)</span> <span class="token keyword">throws</span> AccessException<span class="token punctuation">,</span> AlreadyBoundException<span class="token punctuation">,</span> RemoteException <span class="token punctuation">{</span>
@@ -761,7 +761,7 @@
     <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">setSkeleton</span><span class="token punctuation">(</span>var1<span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">}</span></code></pre>
 <p>这个Skeleton就是前面流程里面的骨架，当执行完上面这两步的时候，UnicastServerRef的skel属性被赋值为一个RegistryImpl_Skel对象</p>
-<p>![image-20200722135923833](个人学习过程中对RMI JRMP 以及JNDI的一些理解/6.png)</p>
+<p><img src="/2020/09/23/ge-ren-xue-xi-guo-cheng-zhong-dui-rmi-jrmp-yi-ji-jndi-de-yi-xie-li-jie/6.png" alt="6"></p>
 <p>我们来看一下这个RegistryImpl_Skel的相关信息，首先该类实现了Skeleton接口，该类的方法很少，如下图所示</p>
 <p>![image-20200722140806970](个人学习过程中对RMI JRMP 以及JNDI的一些理解/7.png)</p>
 <p>其中最关键的方法就是dispatch方法，我们看下在Skeleton接口中对该方法的一个描述</p>
@@ -836,7 +836,7 @@
 
 <span class="token punctuation">}</span></code></pre>
 <p>我们来看一个这个binding属性里的详细信息</p>
-<p>![image-20200722153059904](个人学习过程中对RMI JRMP 以及JNDI的一些理解/8.png)</p>
+<p><img src="/2020/09/23/ge-ren-xue-xi-guo-cheng-zhong-dui-rmi-jrmp-yi-ji-jndi-de-yi-xie-li-jie/8.png" alt="8"></p>
 <p>从这里我们明白了rmiregistry的本质就是一个HashMap，所有注册过的远程方法以键值对的形式存放在这里，当客户端来查询时，rmiregistry将对应的键值对中的Proxy返回给客户端，这样客户端就知道了服务端的地址和所对应的端口号，就可以进行通信了。</p>
 <p>服务端往rmiregistry进行注册这块已经分析差不多了，接下来看看客户端从rmiregistry中查询一直到服务端那里进行调用的过程。</p>
 <p>首先客户端的代码</p>
@@ -886,7 +886,7 @@
 <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
 <span class="token punctuation">}</span></code></pre>
 <p>这里又提到了Stub我们来看看其反序列化完成后是什么样的吧</p>
-<p>![image-20200722161414247](个人学习过程中对RMI JRMP 以及JNDI的一些理解/9.png)</p>
+<p><img src="/2020/09/23/ge-ren-xue-xi-guo-cheng-zhong-dui-rmi-jrmp-yi-ji-jndi-de-yi-xie-li-jie/9.png" alt="9"></p>
 <p>和之前在rmiregistry中看到的那个HashMap中的值一模一样，这下客户端就知道服务端的地址和端口号了，通过这些信息就可以和服务端进行通信了。</p>
 <p>不过在此之前在看一下rmiregistry是怎么处理客户端的查询信息的。</p>
 <pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">//为什么走case2 这里就不再重提了</span>
@@ -922,7 +922,7 @@
         <span class="token comment" spellcheck="true">//表面上时执行sayHello方法，实际上执行的是Proxy对象的Invoke方法</span>
     System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>hello<span class="token punctuation">.</span><span class="token function">sayHello</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
 <p>贴一下调用链</p>
-<p>![image-20200722213007383](个人学习过程中对RMI JRMP 以及JNDI的一些理解/10.png)可以看到核心内容都在UnicastRef的Invoke方法,    下面是该方法的部分代码</p>
+<p><img src="/2020/09/23/ge-ren-xue-xi-guo-cheng-zhong-dui-rmi-jrmp-yi-ji-jndi-de-yi-xie-li-jie/10.png" alt="10">可以看到核心内容都在UnicastRef的Invoke方法,    下面是该方法的部分代码</p>
 <pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">//var1 为当前的Proxy对象，</span>
 <span class="token keyword">public</span> Object <span class="token function">invoke</span><span class="token punctuation">(</span>Remote var1<span class="token punctuation">,</span> Method var2<span class="token punctuation">,</span> Object<span class="token punctuation">[</span><span class="token punctuation">]</span> var3<span class="token punctuation">,</span> <span class="token keyword">long</span> var4<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception <span class="token punctuation">{</span>
 
@@ -996,7 +996,7 @@
     <span class="token keyword">return</span> var13<span class="token punctuation">;</span>
 <span class="token punctuation">}</span></code></pre>
 <p>ok客户端这边的处理过程到此就已经完毕了,接下来跟到服务端看一看。</p>
-<p>![image-20200723101759195](个人学习过程中对RMI JRMP 以及JNDI的一些理解/11.png)</p>
+<p><img src="/2020/09/23/ge-ren-xue-xi-guo-cheng-zhong-dui-rmi-jrmp-yi-ji-jndi-de-yi-xie-li-jie/11.png" alt="11"></p>
 <p>根据调用链信息，先来看UnicastServerRef.dispatch()方法</p>
 <pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">//Var1为实现了Remote接口的HelloImpl对象，Var2为客户端传来的StreamRemoteCall对象该对象里有ConnectionInputStream，也就是说远程调用的参数都在这里面存着</span>
 <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">dispatch</span><span class="token punctuation">(</span>Remote var1<span class="token punctuation">,</span> RemoteCall var2<span class="token punctuation">)</span> <span class="token keyword">throws</span> IOException <span class="token punctuation">{</span>
@@ -1197,7 +1197,7 @@
 <span class="token punctuation">}</span></code></pre>
 <p>然后将接口文件放到Registry项目中，记得包路径要和在服务方的项目中的路径一样否则会爆ClassNotFoundException的错误，Registry项目中的IHello接口中的sayHello方法无需添加参数，因为rmiregistry在返回给客户端Stub时，这个Stub中只有对应的服务端的地址，端口号，以及objID等信息，并没有相关的参数信息。</p>
 <p>Registry项目目录结构如下</p>
-<p>![image-20200724171359592](个人学习过程中对RMI JRMP 以及JNDI的一些理解/12.png)</p>
+<p><img src="/2020/09/23/ge-ren-xue-xi-guo-cheng-zhong-dui-rmi-jrmp-yi-ji-jndi-de-yi-xie-li-jie/12.png" alt="12"></p>
 <p>最后客户端这边，就只需要将Person类按照和服务端一样的包路径拷贝过来，在修改下IHello里sayHell方法的参数就ok了</p>
 <pre class=" language-java"><code class="language-java"><span class="token keyword">package</span> com<span class="token punctuation">.</span>rmitest<span class="token punctuation">.</span>customer<span class="token punctuation">;</span>
 
@@ -1282,7 +1282,7 @@
 <span class="token punctuation">}</span></code></pre>
 <p>可以看成功将Weakness类作为参数进行传递，我们之前说过，服务端在处理客户端传来的远程调用信息时，是会调用UnicastServerRef.dispatch()方法的，会反序列化其中的参数</p>
 <p>看一下调用链即可知</p>
-<p>![image-20200725101015675](个人学习过程中对RMI JRMP 以及JNDI的一些理解/13.png)</p>
+<p><img src="/2020/09/23/ge-ren-xue-xi-guo-cheng-zhong-dui-rmi-jrmp-yi-ji-jndi-de-yi-xie-li-jie/13.png" alt="13"></p>
 <pre class=" language-java"><code class="language-java"><span class="token keyword">protected</span> <span class="token keyword">static</span> Object <span class="token function">unmarshalValue</span><span class="token punctuation">(</span>Class<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token operator">></span> var0<span class="token punctuation">,</span> ObjectInput var1<span class="token punctuation">)</span> <span class="token keyword">throws</span> IOException<span class="token punctuation">,</span> ClassNotFoundException <span class="token punctuation">{</span>
     <span class="token keyword">if</span> <span class="token punctuation">(</span>var0<span class="token punctuation">.</span><span class="token function">isPrimitive</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
         <span class="token keyword">if</span> <span class="token punctuation">(</span>var0 <span class="token operator">==</span> Integer<span class="token punctuation">.</span>TYPE<span class="token punctuation">)</span> <span class="token punctuation">{</span>
@@ -1309,7 +1309,7 @@
         <span class="token keyword">return</span> var1<span class="token punctuation">.</span><span class="token function">readObject</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
     <span class="token punctuation">}</span>
 <span class="token punctuation">}</span></code></pre>
-<p>![image-20200725101529826](个人学习过程中对RMI JRMP 以及JNDI的一些理解/14.png)</p>
+<p><img src="/2020/09/23/ge-ren-xue-xi-guo-cheng-zhong-dui-rmi-jrmp-yi-ji-jndi-de-yi-xie-li-jie/14.png" alt="14"></p>
 <p>至此 我们实在jdk1.7_21的版本下以客户端的身份去成功攻击了服务端。我们切换一个更高版本的jdk来看看情况是不是会有什么不一样。</p>
 <p>经过验证在jdk1.8_221版本的执行结果和jdk1.7_21版本并无不同。</p>
 <h2 id="服务端攻击客户端"><a href="#服务端攻击客户端" class="headerlink" title="服务端攻击客户端"></a>服务端攻击客户端</h2><p>分析完了客户端对服务端的攻击，我们来看一下 服务端对客户端的攻击，根据第二章RMI流程源码分析我们看到了，服务端如果想要攻击客户端，那么利用点就存在客户端反序列话服务端的返回值的时候。这时候需要将环境稍微修改一下。</p>
@@ -1360,7 +1360,7 @@
 <span class="token punctuation">}</span></code></pre>
 <p>如此一来就可以实现通过服务端去攻击客户端</p>
 <p>根据之前的分析客户端在远程方法的调用过程中会在UnicastRef.invoke方法中对服务端返回的数据进行反序列化，看一下调用链</p>
-<p>![image-20200725110434075](个人学习过程中对RMI JRMP 以及JNDI的一些理解/15.png)</p>
+<p><img src="/2020/09/23/ge-ren-xue-xi-guo-cheng-zhong-dui-rmi-jrmp-yi-ji-jndi-de-yi-xie-li-jie/15.png" alt="15"></p>
 <p>如此一来服务端通过RMI攻击客户端的方式也就清晰了。</p>
 <h2 id="服务端攻击客户端-2"><a href="#服务端攻击客户端-2" class="headerlink" title="服务端攻击客户端 2"></a>服务端攻击客户端 2</h2><p>上一小节讲述的服务端攻击客户端的方式是通过返回值来进行操作的，这样的话利用面比较狭窄，那么有没有一种特别通用的利用方式呢？让客户端在lookup一个远程方法的时候能直接造成RCE，事实证明是有的。</p>
 <p>这里就要讲到一个特别的类<code>javax.naming.Reference</code>，下面是该类的官方注释</p>
@@ -1448,11 +1448,11 @@
 <p>接下来就是通过调用bind方法来将<code>ReferenceWrapper</code>对象注册到rmiregistry中。客户端bind <code>Reference</code>过程结束接下来看rmiregistry这边</p>
 <p>这里呢因为 jdk7u21 和 jdk 8u20两个版本在调试的时候无法在<code>RegistryImpl_Skel</code>的<code>dispatch</code>方法上拦截断点所以 暂时采用jdk 8u221版本来进行演示</p>
 <p>同绑定一个正常的远程对像的差别不大只不过绑定一个正常的远程对象的时候，rmiregistry反序列化服务端传递来的结果是这样的</p>
-<p>![image-20200917231839084](个人学习过程中对RMI JRMP 以及JNDI的一些理解/16.png)</p>
+<p><img src="/2020/09/23/ge-ren-xue-xi-guo-cheng-zhong-dui-rmi-jrmp-yi-ji-jndi-de-yi-xie-li-jie/16.png" alt="16"></p>
 <p>而绑定<code>Reference</code>的时候rmiregistry反序列化服务端传递来的结果是这样的</p>
-<p>![image-20200917232042385](个人学习过程中对RMI JRMP 以及JNDI的一些理解/17.png)</p>
+<p><img src="/2020/09/23/ge-ren-xue-xi-guo-cheng-zhong-dui-rmi-jrmp-yi-ji-jndi-de-yi-xie-li-jie/17.png" alt="17"></p>
 <p>可以看到最终注册完成后，二者的区别</p>
-<p>![image-20200917234847316](个人学习过程中对RMI JRMP 以及JNDI的一些理解/18.png)</p>
+<p><img src="/2020/09/23/ge-ren-xue-xi-guo-cheng-zhong-dui-rmi-jrmp-yi-ji-jndi-de-yi-xie-li-jie/18.png" alt="18"></p>
 <p>普通的远程对象是以一个<code>Proxy</code>对象的形式存在，<code>Reference</code>则是以<code>ReferenceWrapper_Stub</code>对象的形式存在</p>
 <p>接下来来看客户端调用<code>Reference</code>这个远程对象的过程，客户端的代码演示环境为jdk 8u20</p>
 <p>首先看下客户端的代码</p>
@@ -1762,7 +1762,7 @@
 <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
 <span class="token punctuation">}</span></code></pre>
 <p>关键点在于<code>var3 = Obj.decodeObject((Attributes)var4)</code>这行代码解析完成后所返回的结果，如下图所示</p>
-<p>![image-20200922161931677](个人学习过程中对RMI JRMP 以及JNDI的一些理解/image-20200922161931677.png)</p>
+<p><img src="/2020/09/23/ge-ren-xue-xi-guo-cheng-zhong-dui-rmi-jrmp-yi-ji-jndi-de-yi-xie-li-jie/19.png" alt="14"></p>
 <p>然后在<code>DirectoryManager.getObjectInstance(var3, var1, this, this.envprops, (Attributes)var4)</code>这行代码中根据Reference中的信息 实例化URLClassloader去远程加载恶意类。</p>
 <p>这种方法一直到jdk 8u191之前的版本都是可用的，但是在之后的版本中同 JNDI rmi Reference一样，添加了对<code>com.sun.jndi.ldap.object.trustURLCodebase</code>属性的校验，该值默认为false</p>
 <h2 id="服务端攻击rmiregistry"><a href="#服务端攻击rmiregistry" class="headerlink" title="服务端攻击rmiregistry"></a>服务端攻击rmiregistry</h2><p>接下来我们就要讲通过服务端来攻击rmiregistry了，和客户端服务端互相攻击的方式比起来相对复杂那么一些，确切的说是通过伪造一个服务端的形式，因为之前说这rmiregistry通常都和真正的服务端出在同一个主机，同一个项目上，根据我们之前对RMI流程的分析，服务端在通过bind方法向rmiregistry绑定远程方法信息时，rmiregistry会反序列化服务端传来的数据，在rmiregistry方处理服务端传来的数据时会调用用RegistryImpl_Skel的dispatch方法，其中会反序列化服务端传来的两个信息，一个是远程方法提供服务的注册名，另一个是封装有远程方法提供服务方信息的Proxy对象。</p>
@@ -1796,7 +1796,7 @@
     <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">></span></span>4.0<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">></span></span>
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">></span></span></code></pre>
 <p>然后展示一下服务端这边最终封装完后的一个Proxy，服务端将这个Proxy序列化后 传递给rmiregistry，然后rmiregistry反序列化该数据从而出发漏洞执行命令</p>
-<p>![image-20200728143909096](个人学习过程中对RMI JRMP 以及JNDI的一些理解/25.png)</p>
+<p><img src="/2020/09/23/ge-ren-xue-xi-guo-cheng-zhong-dui-rmi-jrmp-yi-ji-jndi-de-yi-xie-li-jie/25.png" alt="25"></p>
 <p>最终的调用链简化一下，如下所示</p>
 <pre class=" language-java"><code class="language-java">AnnotationInvocationHandler<span class="token punctuation">.</span><span class="token function">readObject</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
 HashMap<span class="token punctuation">.</span><span class="token function">readObject</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
@@ -1828,7 +1828,7 @@ Runtime<span class="token punctuation">.</span><span class="token function">exec
 <h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://xz.aliyun.com/t/7079" target="_blank" rel="noopener">https://xz.aliyun.com/t/7079</a></p>
 <p><a href="https://xz.aliyun.com/t/7264" target="_blank" rel="noopener">https://xz.aliyun.com/t/7264</a></p>
 <p><a href="https://paper.seebug.org/1091/" target="_blank" rel="noopener">https://paper.seebug.org/1091/</a></p>
-<h2 id><a href="#" class="headerlink" title></a></h2><script>
+<h2 id=""><a href="#" class="headerlink" title=""></a></h2><script>
         document.querySelectorAll('.github-emoji')
           .forEach(el => {
             if (!el.dataset.src) { return; }
@@ -2370,7 +2370,7 @@ code[class*="language-"], pre[class*="language-"] { white-space: pre !important;
             <br>
             
             &nbsp;<i class="fas fa-chart-area"></i>&nbsp;站点总字数:&nbsp;<span
-                class="white-color">66.4k</span>&nbsp;字
+                class="white-color">65.3k</span>&nbsp;字
             
             
             
