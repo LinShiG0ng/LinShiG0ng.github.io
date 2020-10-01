@@ -474,7 +474,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-10-01
+                    2020-10-02
                 </div>
                 
 
@@ -763,7 +763,7 @@
 <p>这个Skeleton就是前面流程里面的骨架，当执行完上面这两步的时候，UnicastServerRef的skel属性被赋值为一个RegistryImpl_Skel对象</p>
 <p><img src="/2020/09/23/ge-ren-xue-xi-guo-cheng-zhong-dui-rmi-jrmp-yi-ji-jndi-de-yi-xie-li-jie/6.png" alt="6"></p>
 <p>我们来看一下这个RegistryImpl_Skel的相关信息，首先该类实现了Skeleton接口，该类的方法很少，如下图所示</p>
-<p>![image-20200722140806970](个人学习过程中对RMI JRMP 以及JNDI的一些理解/7.png)</p>
+<p><img src="/2020/09/23/ge-ren-xue-xi-guo-cheng-zhong-dui-rmi-jrmp-yi-ji-jndi-de-yi-xie-li-jie/7.png" alt="7"></p>
 <p>其中最关键的方法就是dispatch方法，我们看下在Skeleton接口中对该方法的一个描述</p>
 <pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">/**
  * Unmarshals arguments, calls the actual remote object implementation,
