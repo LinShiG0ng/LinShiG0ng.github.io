@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://linshig0ng.github.io/"/>
-  <updated>2020-10-01T17:09:31.403Z</updated>
+  <updated>2020-10-26T01:39:38.168Z</updated>
   <id>http://linshig0ng.github.io/</id>
   
   <author>
@@ -17,11 +17,35 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>高版本 JDK RMI JNDI Bypass 学习笔记/HTTP走私学习笔记</title>
+    <link href="http://linshig0ng.github.io/2020/10/26/gao-ban-ben-jdk-rmi-jndi-bypass-xue-xi-bi-ji/http-zou-si-xue-xi-bi-ji/"/>
+    <id>http://linshig0ng.github.io/2020/10/26/gao-ban-ben-jdk-rmi-jndi-bypass-xue-xi-bi-ji/http-zou-si-xue-xi-bi-ji/</id>
+    <published>2020-10-26T01:39:38.168Z</published>
+    <updated>2020-10-26T01:39:38.168Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;h1 id=&quot;HTTP走私学习笔记&quot;&gt;&lt;a href=&quot;#HTTP走私学习笔记&quot; class=&quot;headerlink&quot; title=&quot;HTTP走私学习笔记&quot;&gt;&lt;/a&gt;HTTP走私学习笔记&lt;/h1&gt;&lt;script&gt;
+       
+        
+      
+    
+    </summary>
+    
+    
+    
+  </entry>
+  
+  <entry>
     <title>高版本 JDK RMI JNDI Bypass 学习笔记</title>
     <link href="http://linshig0ng.github.io/2020/09/29/gao-ban-ben-jdk-rmi-jndi-bypass-xue-xi-bi-ji/"/>
     <id>http://linshig0ng.github.io/2020/09/29/gao-ban-ben-jdk-rmi-jndi-bypass-xue-xi-bi-ji/</id>
     <published>2020-09-29T14:44:01.000Z</published>
-    <updated>2020-10-01T17:09:31.403Z</updated>
+    <updated>2020-10-27T15:59:37.345Z</updated>
     
     <summary type="html">
     
@@ -52,7 +76,7 @@
     <link href="http://linshig0ng.github.io/2020/09/23/websphere-cve-2020-4450-fan-xu-lie-hua-yuan-cheng-dai-ma-zhi-xing-lou-dong-shen-du-fen-xi/"/>
     <id>http://linshig0ng.github.io/2020/09/23/websphere-cve-2020-4450-fan-xu-lie-hua-yuan-cheng-dai-ma-zhi-xing-lou-dong-shen-du-fen-xi/</id>
     <published>2020-09-23T14:44:01.000Z</published>
-    <updated>2020-10-01T11:34:40.701Z</updated>
+    <updated>2020-10-27T15:58:22.506Z</updated>
     
     <summary type="html">
     
@@ -81,7 +105,7 @@
     <link href="http://linshig0ng.github.io/2020/09/23/ge-ren-xue-xi-guo-cheng-zhong-dui-rmi-jrmp-yi-ji-jndi-de-yi-xie-li-jie/"/>
     <id>http://linshig0ng.github.io/2020/09/23/ge-ren-xue-xi-guo-cheng-zhong-dui-rmi-jrmp-yi-ji-jndi-de-yi-xie-li-jie/</id>
     <published>2020-09-23T14:44:01.000Z</published>
-    <updated>2020-10-01T17:05:31.362Z</updated>
+    <updated>2020-10-27T16:01:43.732Z</updated>
     
     <summary type="html">
     
@@ -112,7 +136,7 @@
     <link href="http://linshig0ng.github.io/2020/07/03/apache-dubbo-cve-2020-1948-fan-xu-lie-hua-yuan-cheng-dai-ma-zhi-xing-lou-dong-ji-qi-bu-ding-rao-guo-shen-du-fen-xi/"/>
     <id>http://linshig0ng.github.io/2020/07/03/apache-dubbo-cve-2020-1948-fan-xu-lie-hua-yuan-cheng-dai-ma-zhi-xing-lou-dong-ji-qi-bu-ding-rao-guo-shen-du-fen-xi/</id>
     <published>2020-07-03T14:44:01.000Z</published>
-    <updated>2020-07-14T01:45:35.343Z</updated>
+    <updated>2020-10-27T15:35:22.970Z</updated>
     
     <summary type="html">
     
@@ -143,7 +167,7 @@
     <link href="http://linshig0ng.github.io/2020/06/01/java-fan-xu-lie-hua-xi-lie-ysoserialjdk7u21/"/>
     <id>http://linshig0ng.github.io/2020/06/01/java-fan-xu-lie-hua-xi-lie-ysoserialjdk7u21/</id>
     <published>2020-05-31T16:19:08.000Z</published>
-    <updated>2020-05-31T16:35:39.423Z</updated>
+    <updated>2020-10-27T15:53:20.958Z</updated>
     
     <summary type="html">
     
@@ -201,7 +225,7 @@
     <link href="http://linshig0ng.github.io/2020/05/31/java-fan-xu-lie-hua-xi-lie-ysoserialhibernate1/"/>
     <id>http://linshig0ng.github.io/2020/05/31/java-fan-xu-lie-hua-xi-lie-ysoserialhibernate1/</id>
     <published>2020-05-31T15:43:12.000Z</published>
-    <updated>2020-10-01T10:27:02.785Z</updated>
+    <updated>2020-10-27T15:52:32.448Z</updated>
     
     <summary type="html">
     
@@ -230,7 +254,7 @@
     <link href="http://linshig0ng.github.io/2020/05/31/java-fan-xu-lie-hua-xi-lie-ysoserialgroovy1/"/>
     <id>http://linshig0ng.github.io/2020/05/31/java-fan-xu-lie-hua-xi-lie-ysoserialgroovy1/</id>
     <published>2020-05-31T15:28:31.000Z</published>
-    <updated>2020-05-31T16:32:39.197Z</updated>
+    <updated>2020-10-27T15:50:39.929Z</updated>
     
     <summary type="html">
     
@@ -259,7 +283,7 @@
     <link href="http://linshig0ng.github.io/2020/05/31/paddingoracle-yuan-li-shen-du-jie-xi/"/>
     <id>http://linshig0ng.github.io/2020/05/31/paddingoracle-yuan-li-shen-du-jie-xi/</id>
     <published>2020-05-31T15:06:52.000Z</published>
-    <updated>2020-07-06T03:09:48.605Z</updated>
+    <updated>2020-10-27T15:54:50.975Z</updated>
     
     <summary type="html">
     
@@ -290,7 +314,7 @@
     <link href="http://linshig0ng.github.io/2020/05/31/apachetomcat-cong-wen-jian-bao-han-dao-rce-lou-dong-yuan-li-shen-ru-fen-xi/"/>
     <id>http://linshig0ng.github.io/2020/05/31/apachetomcat-cong-wen-jian-bao-han-dao-rce-lou-dong-yuan-li-shen-ru-fen-xi/</id>
     <published>2020-05-31T14:44:01.000Z</published>
-    <updated>2020-05-31T16:31:11.737Z</updated>
+    <updated>2020-10-27T15:36:12.716Z</updated>
     
     <summary type="html">
     
@@ -352,7 +376,7 @@
     <link href="http://linshig0ng.github.io/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/"/>
     <id>http://linshig0ng.github.io/2020/05/31/velocity-mo-ban-zhu-ru-lou-dong-shen-du-fen-xi/</id>
     <published>2020-05-30T17:24:13.000Z</published>
-    <updated>2020-05-31T16:40:28.197Z</updated>
+    <updated>2020-10-27T15:57:18.745Z</updated>
     
     <summary type="html">
     
@@ -383,7 +407,7 @@
     <link href="http://linshig0ng.github.io/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/"/>
     <id>http://linshig0ng.github.io/2020/05/31/java-kuang-jia-ji-ssm-dai-ma-shen-ji-si-lu/</id>
     <published>2020-05-30T17:24:13.000Z</published>
-    <updated>2020-05-31T16:33:45.507Z</updated>
+    <updated>2020-10-27T15:54:12.502Z</updated>
     
     <summary type="html">
     
